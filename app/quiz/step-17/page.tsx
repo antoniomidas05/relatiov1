@@ -1,95 +1,125 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { ArrowLeft, Check, CircleOff, HelpCircle } from "lucide-react"
-import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { QuizLayout } from "@/components/quiz-layout"
+import Image from "next/image"
+
+// Componente de Ícone
+const BackArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
 
 function Step17Content() {
-  const [selectedOption, setSelectedOption] = useState<string>("")
   const router = useRouter()
   const searchParams = useSearchParams()
-  // Récupère les paramètres de l'URL
-  const gender = searchParams.get("gender") || "male"
-  const age = searchParams.get("age") || ""
-  const tiredness = searchParams.get("tiredness") || ""
-  const lastMinute = searchParams.get("lastMinute") || ""
-  const distraction = searchParams.get("distraction") || ""
-  const worried = searchParams.get("worried") || ""
-  const moodSwings = searchParams.get("moodSwings") || ""
-  const harmony = searchParams.get("harmony") || ""
-  const emotions = searchParams.get("emotions") || ""
-  const overwhelmed = searchParams.get("overwhelmed") || ""
-  const decision = searchParams.get("decision") || ""
-  const ambitions = searchParams.get("ambitions") || ""
-  const compliments = searchParams.get("compliments") || ""
-  const insecure = searchParams.get("insecure") || ""
-  const overthinkPartner = searchParams.get("overthinkPartner") || ""
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([])
 
-  const handleOptionSelect = (option: string) => {
-    setSelectedOption(option)
-    setTimeout(() => {
-      router.push(
-        `/quiz/step-18?gender=${gender}&age=${age}&tiredness=${tiredness}&lastMinute=${lastMinute}&distraction=${distraction}&worried=${worried}&moodSwings=${moodSwings}&harmony=${harmony}&emotions=${emotions}&overwhelmed=${overwhelmed}&decision=${decision}&ambitions=${ambitions}&compliments=${compliments}&insecure=${insecure}&overthinkPartner=${overthinkPartner}&prioritizeOthers=${option}`,
-      )
-    }, 300)
-  }
-
-  const options = [
-    { text: "Souvent", icon: Check },
-    { text: "Parfois", icon: HelpCircle },
-    { text: "Jamais", icon: CircleOff },
+  const breakupReasons = [
+    { id: "arguing", emoji: "😤", text: "Constant arguing" },
+    { id: "communication", emoji: "🗣️", text: "Lack of communication" },
+    { id: "intimacy", emoji: "🙌", text: "Loss of emotional or physical intimacy" },
+    { id: "goals", emoji: "🎯", text: "Incompatibility in long-term goals" },
+    { id: "financial", emoji: "💵", text: "Financial disagreements" },
+    { id: "partner_unfaithful", emoji: "💔", text: "My partner was unfaithful to me" },
+    { id: "i_was_unfaithful", emoji: "😔", text: "I was unfaithful to my partner" },
+    { id: "external_pressures", emoji: "😒", text: "External pressures (e.g., disapproving family)" },
+    { id: "values", emoji: "😥", text: "Different values" },
+    { id: "unknown", emoji: "🤔", text: "I don't know" },
   ]
 
+  const currentStep = 13
+  const totalSteps = 38
+  const progressPercentage = (currentStep / totalSteps) * 100
+
+  const handleSelectReason = (reasonId: string) => {
+    setSelectedReasons((prev) => {
+      const isSelected = prev.includes(reasonId)
+      if (isSelected) {
+        // Desmarcar a opção
+        return prev.filter((id) => id !== reasonId)
+      } else {
+        // Marcar a opção, se o limite não foi atingido
+        if (prev.length < 3) {
+          return [...prev, reasonId]
+        }
+      }
+      // Retorna o estado anterior se o limite de 3 já foi atingido
+      return prev
+    })
+  }
+
+  const handleContinue = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    // Converte o array de respostas em uma string separada por vírgulas
+    params.set("breakup_reasons", selectedReasons.join(","))
+    // Navega para a próxima etapa, por exemplo, step-18
+    router.push(`/quiz/step-18?${params.toString()}`)
+  }
+
   return (
-    // Utiliser QuizLayout pour la barre de progression, maintenant à l'étape 14/26
-    <QuizLayout step={14} totalSteps={26}>
-      <header className="w-full px-6 py-4 flex justify-between items-center absolute top-0 left-0 right-0 bg-[#f5f3f0] z-10">
-        <Link
-          href={`/quiz/step-16?gender=${gender}&age=${age}&tiredness=${tiredness}&lastMinute=${lastMinute}&distraction=${distraction}&worried=${worried}&moodSwings=${moodSwings}&harmony=${harmony}&emotions=${emotions}&overwhelmed=${overwhelmed}&decision=${decision}&ambitions=${ambitions}&compliments=${compliments}&insecure=${insecure}&overthinkPartner=${overthinkPartner}`}
-          className="p-2"
-        >
-          <ArrowLeft className="w-6 h-6 text-black" />
-        </Link>
-        <div className="flex items-center gap-2">{/* L'icône centrale peut être ajoutée ici si nécessaire */}</div>
-        <span className="text-gray-600 text-sm font-medium">14/26</span>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2"><BackArrowIcon /></button>
+        <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={120} height={35} priority />
+        <span className="font-semibold text-gray-700 w-12 text-right">{String(currentStep).padStart(2, "0")} / {totalSteps}</span>
       </header>
-      <main className="flex flex-col items-center justify-center px-3 pt-1 pb-2 max-w-2xl mx-auto mt-4">
-        <div className="text-center space-y-4 mb-12">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Donnez-vous souvent la priorité aux besoins des autres
-            <br />
-            et sacrifiez-vous les vôtres ?
-          </h1>
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full bg-gray-200 rounded-full h-1">
+          <div className="bg-purple-500 h-1 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
         </div>
-        <div className="w-full max-w-md space-y-4">
-          {options.map((option) => {
-            const Icon = option.icon
-            return (
-              <button
-                key={option.text}
-                onClick={() => handleOptionSelect(option.text)}
-                className={`w-full p-4 text-left text-lg font-medium rounded-lg border-2 transition-all duration-200 flex items-center gap-4 ${
-                  selectedOption === option.text
-                    ? "border-teal-500 bg-white text-gray-800"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <Icon className={`w-6 h-6 ${selectedOption === option.text ? "text-teal-500" : "text-gray-400"}`} />
-                <span>{option.text}</span>
-              </button>
-            )
-          })}
+      </div>
+      {/* O main ocupa o espaço restante, e a lista pode rolar se necessário */}
+      <main className="flex-grow flex flex-col items-center p-6 text-center overflow-y-auto">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800">What were the reasons for the breakup?</h1>
+          <p className="text-gray-500 mb-6">( Choose up to 3 )</p>
+          <div className="space-y-3">
+            {breakupReasons.map((reason) => {
+              const isSelected = selectedReasons.includes(reason.id)
+              return (
+                <button
+                  key={reason.id}
+                  onClick={() => handleSelectReason(reason.id)}
+                  className={`w-full p-3 rounded-full flex justify-between items-center transition-colors duration-200 ${
+                    isSelected ? "bg-purple-100" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{reason.emoji}</span>
+                    <span className={`font-semibold ${isSelected ? "text-purple-700" : "text-gray-700"}`}>{reason.text}</span>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      isSelected ? "border-purple-500 bg-purple-500" : "border-gray-300 bg-white"
+                    }`}
+                  >
+                    {isSelected && <span className="text-white text-sm">✔</span>}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
       </main>
-    </QuizLayout>
+      <footer className="w-full p-4 bg-gray-100 border-t border-gray-200">
+        <div className="w-full max-w-md mx-auto">
+          <button
+            onClick={handleContinue}
+            disabled={selectedReasons.length === 0}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Continue
+          </button>
+        </div>
+      </footer>
+    </div>
   )
 }
 
 export default function Step17() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step17Content />
     </Suspense>
   )

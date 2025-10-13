@@ -26,7 +26,7 @@ function Step4MContent() {
   const handleContinue = () => {
     const params = new URLSearchParams(searchParams.toString())
     params.set("decision_making", selectedOption.toLowerCase())
-    router.push(`/quiz/step-5?${params.toString()}`)
+    router.push(`/quiz/step-5-m?${params.toString()}`)
   }
 
   return (
