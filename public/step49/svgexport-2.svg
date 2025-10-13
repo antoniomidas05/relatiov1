@@ -1,0 +1,67 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 312 230" width="312"  height="230" >
+            <defs>
+                <linearGradient id="bpGradient" x1="20" y1="174" x2="290" y2="66" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#0074E8"></stop>
+                    <stop offset="100%" stop-color="#FF0080"></stop>
+                </linearGradient>
+            <linearGradient id="bpGradient" x1="20" y1="174" x2="290" y2="66" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#0074E8"></stop>
+                    <stop offset="100%" stop-color="#FF0080"></stop>
+                </linearGradient></defs>
+
+            <path d="
+  M2 184
+  C36 182, 74 175, 111 162
+  C151 147, 161 130, 198 100
+  C227 78, 251 66, 291 62
+  C301 61, 304 61, 310 61" id="anxietyPath" class="line" stroke-linecap="round" style="stroke-dasharray: 340.201; stroke-dashoffset: 340.201;" stroke="url(&quot;#bpGradient&quot;)" fill="none" stroke-width="4px"></path>
+
+            <circle class="point point-blue" cx="40" cy="180" r="8" style="animation-delay: 338.379ms;" stroke="#FFFFFF" fill="#1563DB" stroke-width="3px"></circle>
+            <circle class="point point-blue" cx="122" cy="158" r="8" style="animation-delay: 1088.38ms;" stroke="#FFFFFF" fill="#6348BF" stroke-width="3px"></circle>
+            <circle class="point point-violet" cx="196" cy="100" r="8" style="animation-delay: 1908.69ms;" stroke="#FFFFFF" fill="#AE25A0" stroke-width="3px"></circle>
+            <circle class="point point-pink" cx="264" cy="64" r="8" style="animation-delay: 2591.31ms;" stroke="#FFFFFF" fill="#FB0282" stroke-width="3px"></circle>
+
+                            <g class="first-label" style="opacity: 0; animation-delay: 607.91ms;" x="70">
+                    <rect x="2" y="129" rx="8" width="76" height="32" fill="#FFFFFF"></rect>
+                    <text x="41" y="141" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        Your ex sees no
+                    </text>
+                    <text x="41" y="155" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        future together
+                    </text>
+                    <polygon points="30,159 50,159 40,167" fill="#FFFFFF"></polygon>
+                </g>
+                <g class="first-label" style="opacity: 0; animation-delay: 1067.87ms;" x="120">
+                    <rect x="82" y="105" rx="8" width="82" height="32" fill="#FFFFFF"></rect>
+                    <text x="123" y="118" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        Your Ex starts
+                    </text>
+                    <text x="123" y="131" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        thinking of you
+                    </text>
+                    <polygon points="112,134 132,134 122,144" fill="#FFFFFF"></polygon>
+                </g>
+                <g class="second-label" style="opacity: 0; animation-delay: 2063.96ms;" x="210">
+                    <rect x="140" y="48" rx="8" width="112" height="32" fill="#FFFFFF"></rect>
+                    <text x="198" y="61" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        She can’t imagine
+                    </text>
+                    <text x="198" y="73" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        her life without you
+                    </text>
+                    <polygon points="186,78 206,78 196,86" fill="#FFFFFF"></polygon>
+                </g>
+                <g class="after-label" style="opacity: 0; animation-delay: 2591.31ms;" x="264">
+                    <rect x="214" y="0" rx="8" width="96" height="44" fill="#FFFFFF"></rect>
+                    <text x="262" y="14" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        She does
+                    </text>
+                    <text x="262" y="26" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        everything to get
+                    </text>
+                    <text x="262" y="38" text-anchor="middle" fill="#1E1E1E" font-size="10" font-weight="700">
+                        you back
+                    </text>
+                    <polygon points="254,42 274,42 264,50" fill="#FFFFFF"></polygon>
+                </g>
+                    </svg>

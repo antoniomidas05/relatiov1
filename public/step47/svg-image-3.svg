@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink"  class="svg">
+                <defs>
+                    <linearGradient id="gradientStyle">
+                        <stop offset="0%" stop-color="#d53090"></stop>
+                        <stop offset="70.12%" stop-color="#3a78e6"></stop>
+                        <stop offset="95.97%" stop-color="#0074E8"></stop>
+                        <stop offset="99.86%" stop-color="#3a78e6"></stop>
+                    </linearGradient>
+                </defs>
+                <filter id="gaussian-blur">
+                    <feGaussianBlur stdDeviation="1 0"></feGaussianBlur>
+                </filter>
+                <g filter="url(#gaussian-blur)">
+                    <circle class="circle" cx="90" cy="90" r="80" style="stroke-dashoffset: 85.51;"></circle>
+                    
+                </g>
+            </svg>
