@@ -1,63 +1,149 @@
 "use client"
 
-import { Suspense } from "react"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { QuizLayout } from "@/components/quiz-layout"
+import Image from "next/image"
+import Link from "next/link"
+
+// Componente para o ícone de seta para voltar
+const BackArrowIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-6 w-6 text-gray-700"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
+
+// Componente para o ícone de verificação (check)
+const CheckIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-6 w-6 text-white"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+  >
+    <path
+      fillRule="evenodd"
+      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+      clipRule="evenodd"
+    />
+  </svg>
+)
 
 function Step2Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const query = searchParams.toString()
+  const [selectedAge, setSelectedAge] = useState<string>("18-29")
 
-  const ageRanges = ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
+  const ageOptions = ["18-29", "30-44", "45-54", "55+"]
+  const currentStep = 2
+  const totalSteps = 38
+  const progressPercentage = (currentStep / totalSteps) * 100
 
-  const handleAgeSelect = (age: string) => {
-    // Mappe "65+" à "65" dans l'URL
-    const ageForUrl = age === "65+" ? "65" : age
-    const params = new URLSearchParams(searchParams)
-    params.set("age", ageForUrl)
+  const handleContinue = () => {
+    // A sua lógica aqui já estava correta!
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("age", selectedAge)
     router.push(`/quiz/step-3?${params.toString()}`)
   }
 
   return (
-    <QuizLayout step={2} totalSteps={26}>
-      <header className="w-full px-6 py-4 flex justify-between items-center absolute top-0 left-0 right-0 bg-[#f5f3f0] z-10">
-        <Link href={`/quiz/step-1?${query}`} className="p-2">
-          <ArrowLeft className="w-6 h-6 text-black" />
-        </Link>
-        <div className="flex items-center gap-2"></div>
-        <span className="text-gray-600 text-sm font-medium">2/26</span>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* --- CABEÇALHO (Adicionado de volta) --- */}
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2">
+          <BackArrowIcon />
+        </button>
+        <Image
+          src="/step1/logotype-color.svg"
+          alt="Relatio Logo"
+          width={120}
+          height={35}
+          priority
+        />
+        <span className="font-semibold text-gray-700 w-12 text-right">
+          {String(currentStep).padStart(2, "0")} / {totalSteps}
+        </span>
       </header>
 
-      {/* --- MODIFICATION ICI --- */}
-      {/* Nous avons remplacé 'py-12' (rembourrage vertical) par 'pt-8 pb-12' pour réduire le rembourrage supérieur */}
-      <main className="flex flex-col items-center justify-center px-3 pt-1 pb-2 max-w-2xl mx-auto mt-4">
-        <div className="text-center space-y-6 mb-12">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Quel est votre âge ?</h1>
-          <p className="text-gray-600 text-lg">Cela nous aide à personnaliser votre expérience</p>
+      {/* --- BARRA DE PROGRESSO (Adicionada de volta) --- */}
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full bg-gray-200 rounded-full h-1">
+          <div
+            className="bg-purple-500 h-1 rounded-full"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
         </div>
+      </div>
 
-        <div className="w-full max-w-md space-y-4">
-          {ageRanges.map((age) => (
-            <button
-              key={age}
-              onClick={() => handleAgeSelect(age)}
-              className="w-full p-4 text-left bg-white border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-gray-800 font-medium"
-            >
-              {age}
-            </button>
-          ))}
+      {/* --- CONTEÚDO PRINCIPAL (Adicionado de volta) --- */}
+      <main className="flex-grow flex flex-col items-center p-6 text-center">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">
+            What's your age?
+          </h1>
+          <p className="text-gray-600 mb-8">
+            Dealing with relationships at different life stages requires
+            different approaches. Share your age with us so we can start
+            creating your{" "}
+            <Link href="#" className="text-blue-500 font-medium">
+              Personalized Plan
+            </Link>
+          </p>
+
+          <div className="space-y-3">
+            {ageOptions.map((age) => (
+              <button
+                key={age}
+                onClick={() => setSelectedAge(age)}
+                className={`w-full p-4 rounded-full flex justify-between items-center transition-all duration-200 ${
+                  selectedAge === age
+                    ? "bg-blue-100 border border-blue-500"
+                    : "bg-white border border-transparent hover:bg-gray-50"
+                }`}
+              >
+                <span
+                  className={`font-semibold ${
+                    selectedAge === age ? "text-blue-600" : "text-gray-700"
+                  }`}
+                >
+                  {age}
+                </span>
+                {selectedAge === age && (
+                  <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center">
+                    <CheckIcon />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </main>
-    </QuizLayout>
+
+      {/* --- RODAPÉ COM BOTÃO DE CONTINUAR (Já estava correto) --- */}
+      <footer className="w-full p-4 bg-gray-100">
+        <div className="w-full max-w-md mx-auto">
+          <button
+            onClick={handleContinue}
+            disabled={!selectedAge}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            Continue
+          </button>
+        </div>
+      </footer>
+    </div>
   )
 }
 
 export default function Step2() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step2Content />
     </Suspense>
   )

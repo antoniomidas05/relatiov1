@@ -1,79 +1,96 @@
 "use client"
 
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
 import Image from "next/image"
+import { Suspense } from "react"
+
+// Componente para o ícone de seta para voltar (reutilizado)
+const BackArrowIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-6 w-6 text-gray-700"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
 
 function Step3Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const gender = searchParams.get("gender") || "male"
-  const age = searchParams.get("age") || ""
+  const gender = searchParams.get("gender")
+
+  const isFemale = gender === "female"
+  const imageSrc = isFemale
+    ? "/step3/203_ValueProp.png"
+    : "/step3/303_ValueProp.png"
+  const captionText = isFemale
+    ? "We've helped hundreds of thousands of women restore their relationships"
+    : "We've helped hundreds of thousands of men restore their relationships"
 
   const handleContinue = () => {
-    router.push(`/quiz/step-4?gender=${gender}&age=${age}`)
+    const nextStepUrl = isFemale 
+      ? "/quiz/step-4-m" 
+      : "/quiz/step-4-h"
+      
+    router.push(`${nextStepUrl}?${searchParams.toString()}`)
   }
 
-  // Choisit l'image de profil en fonction du genre
-  const centralProfileImage = gender === "female" ? "/images/female1.avif" : "/images/male2.avif"
-
   return (
-    <div className="min-h-screen bg-[#f5f3f0]">
-      {/* En-tête personnalisé pour les pages du quiz */}
-      <header className="w-full px-6 py-4 flex justify-between items-center">
-        <Link href={`/quiz/step-2?gender=${gender}`} className="p-2">
-          <ArrowLeft className="w-6 h-6 text-black" />
-        </Link>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-            <div className="w-5 h-5 bg-white rounded-full relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-3 h-3 bg-black rounded-full"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="w-10"></div> {/* Espaceur pour le centrage */}
-      </header>
-
-      <main className="flex flex-col items-center justify-center px-3 pt-1 pb-2 max-w-2xl mx-auto mt-4">
-        <div className="text-center space-y-2 mb-16">
-          <h1 className="text-2xl md:text-3xl font-bold text-teal-600">Plus de 1 000 000 de personnes</h1>
-          <p className="text-gray-800 text-lg">ont choisi Liven</p>
-        </div>
-
-        {/* 
-        IMAGE CENTRALE - MAINTENANT SIMPLIFIÉE ET PLUS GRANDE 
-        Nous avons supprimé le conteneur 'relative' et tous les éléments environnants.
-        L'image est maintenant un élément direct du conteneur flex 'main'.
-        */}
-        <div className="w-80 h-80 rounded-full overflow-hidden border-4 border-white shadow-lg mb-16">
-          <Image
-            src={centralProfileImage || "/placeholder.svg"}
-            alt={`Profil ${gender === "female" ? "féminin" : "masculin"}`}
-            width={320} // Correspond à w-80 (320px)
-            height={320} // Correspond à h-80 (320px)
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        <button
-          onClick={handleContinue}
-          className="w-full max-w-sm bg-green-600 hover:bg-green-700 text-white font-medium py-4 px-8 rounded-full text-lg transition-colors"
-        >
-          Continuer
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2">
+          <BackArrowIcon />
         </button>
+        <Image
+          src="/step3/logotype-color.svg"
+          alt="Relatio Logo"
+          width={120}
+          height={35}
+          priority
+        />
+        <div className="w-10"></div>
+      </header>
+      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-full max-w-md flex flex-col items-center">
+          <h2 className="text-xl font-bold text-blue-500">
+            1.3 MILLION PEOPLE
+          </h2>
+          <p className="text-xl font-semibold text-gray-800 mb-10">
+            have chosen Relatio
+          </p>
+          <div className="mb-10">
+            <Image
+              src={imageSrc}
+              alt="People who have chosen Relatio"
+              width={250}
+              height={250}
+              priority
+            />
+          </div>
+          <p className="text-gray-600 max-w-xs">{captionText}</p>
+        </div>
       </main>
+      <footer className="w-full p-4 bg-gray-100">
+        <div className="w-full max-w-md mx-auto">
+          <button
+            onClick={handleContinue}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity"
+          >
+            Continue
+          </button>
+        </div>
+      </footer>
     </div>
   )
 }
 
-// Le composant exporté reste le même
 export default function Step3() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step3Content />
     </Suspense>
   )
