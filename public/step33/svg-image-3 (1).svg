@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="0 0 314 312">
+            <defs>
+                <linearGradient id="riskGradient" x1="16" y1="108" x2="298" y2="202" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FF0080"></stop>
+                    <stop offset="1" stop-color="#0074E8"></stop>
+                </linearGradient>
+            </defs>
+
+            <path d="M16 108 C130 108, 135 202, 298 202" id="anxietyPath" class="line" stroke-linecap="round" style="stroke-dasharray: 302.829; stroke-dashoffset: 302.829;"></path>
+
+            <circle class="point point-pink" cx="48" cy="110" r="10" style="fill: rgb(255, 0, 128); animation-delay: 158.936ms;"></circle>
+            <line class="connector" x1="48" y1="124" x2="48" y2="225" stroke-dasharray="2 2" stroke-linecap="round" stroke="#FF0080" style="animation-delay: 158.936ms;"></line>
+
+            <circle class="point point-blue" cx="266" cy="202" r="10" style="fill: rgb(0, 128, 255); animation-delay: 1341.06ms;"></circle>
+            <line class="connector" x1="266" y1="214" x2="266" y2="225" stroke-dasharray="2 2" stroke-linecap="round" stroke="#0080FF " style="animation-delay: 1341.06ms;"></line>
+
+            <g class="label" style="opacity: 0; animation-delay: 0.732422ms;">
+                <rect x="16" y="66" rx="8" width="60" height="24" fill="#FFF"></rect>
+                <text x="46" y="80" text-anchor="middle" fill="#FF0080" font-size="10" font-weight="700">Now</text>
+
+                <polygon points="30,82 66,82 48,98" fill="#FFF"></polygon>
+            </g>
+
+            <g class="after-label fade-in" style="opacity: 1; animation: 0.6s ease-out 0s 1 normal forwards running fadeIn;" data-delay="1700" data-animation="fadeIn 0.6s ease-out forwards">
+                <rect x="226" y="160" rx="8" width="72" height="24" fill="#FFF"></rect>
+                <text x="262" y="176" text-anchor="middle" fill="#0080FF" font-size="10" font-weight="700">In 2 months</text>
+
+                <polygon points="250,180 282,180 266,190" fill="#FFF"></polygon>
+            </g>
+        </svg>
