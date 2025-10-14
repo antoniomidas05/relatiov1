@@ -1,244 +1,114 @@
 "use client"
 
-import { Suspense, useEffect, useState, useRef, useMemo } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import Image from "next/image"
 
-// --- Fonction utilitaire pour créer un chemin SVG lisse ---
-const createSvgPath = (points, smoothing, dimensions) => {
-  if (points.length === 0) return ""
+// Componente de Ícone
+const BackArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
 
-  const svgPoints = points.map((point) => ({
-    x: ((point.week - 1) / (points.length - 1)) * dimensions.width,
-    y: dimensions.height - (point.value / 100) * dimensions.height,
-  }))
-
-  const line = (pointA, pointB) => {
-    const lengthX = pointB.x - pointA.x
-    const x1 = pointA.x + lengthX * smoothing
-    const y1 = pointA.y
-    const x2 = pointB.x - lengthX * smoothing
-    const y2 = pointB.y
-    return `C ${x1},${y1} ${x2},${y2} ${pointB.x},${pointB.y}`
-  }
-
-  const pathParts = svgPoints.reduce((acc, point, i, a) => {
-    if (i === 0) return `M ${point.x},${point.y}`
-    return `${acc} ${line(a[i - 1], point)}`
-  }, "")
-
-  return pathParts
-}
-
-// --- Le composant de graphique dynamique ---
-function WellbeingChart() {
-  const [isAnimated, setIsAnimated] = useState(false)
-  const pathRef = useRef(null)
-  const [pathLength, setPathLength] = useState(0)
-
-  const chartData = [
-    { week: 1, value: 15, label: "Aujourd'hui" },
-    { week: 2, value: 35 },
-    { week: 3, value: 75 },
-    { week: 4, value: 85 },
-  ]
-  const dimensions = { width: 500, height: 180 }
-
-  const pathD = useMemo(() => createSvgPath(chartData, 0.2, dimensions), [chartData])
-  const areaPathD = `${pathD} V ${dimensions.height} H 0 Z`
-
-  useEffect(() => {
-    if (pathRef.current) {
-      setPathLength(pathRef.current.getTotalLength())
-    }
-    const timer = setTimeout(() => setIsAnimated(true), 300)
-    return () => clearTimeout(timer)
-  }, [pathD])
-
-  return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-800 text-center mb-8">Votre niveau de bien-être</h2>
-
-      <div className="relative w-full" style={{ height: `${dimensions.height}px` }}>
-        {/* Lignes de la grille */}
-        <div className="absolute inset-0">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-full border-t border-dashed border-gray-200"
-              style={{ bottom: `${(dimensions.height / 5) * (i + 1)}px`, left: 0 }}
-            ></div>
-          ))}
-        </div>
-
-        {/* SVG pour le remplissage dégradé et la ligne animée */}
-        <svg
-          className="absolute top-0 left-0 w-full h-full"
-          viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style={{ stopColor: "rgba(239, 68, 68, 0.1)", stopOpacity: 1 }} />
-              <stop offset="33%" style={{ stopColor: "rgba(249, 115, 22, 0.15)", stopOpacity: 1 }} />
-              <stop offset="66%" style={{ stopColor: "rgba(234, 179, 8, 0.2)", stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: "rgba(34, 197, 94, 0.25)", stopOpacity: 1 }} />
-            </linearGradient>
-          </defs>
-          <path
-            d={areaPathD}
-            fill="url(#areaGradient)"
-            className={`transition-opacity duration-1000 ease-in-out ${isAnimated ? "opacity-100" : "opacity-0"}`}
-          />
-          <path
-            ref={pathRef}
-            d={pathD}
-            fill="none"
-            stroke="#22c55e"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            style={{
-              strokeDasharray: pathLength,
-              strokeDashoffset: isAnimated ? 0 : pathLength,
-              transition: "stroke-dashoffset 2s ease-in-out",
-            }}
-          />
-        </svg>
-
-        {/* Points de données et étiquettes */}
-        <div className="absolute inset-0">
-          {chartData.map((point, index) => {
-            const pointColors = ["bg-red-500", "bg-orange-400", "bg-yellow-500", "bg-green-500"]
-            const leftPercentage = ((point.week - 1) / (chartData.length - 1)) * 100
-            const bottomPercentage = (point.value / 100) * 100
-
-            return (
-              <div
-                key={point.week}
-                className="absolute"
-                style={{
-                  left: `${leftPercentage}%`,
-                  bottom: `${bottomPercentage}%`,
-                  transform: "translate(-50%, 50%)",
-                }}
-              >
-                <div
-                  className={`w-5 h-5 rounded-full border-4 border-white ring-1 ring-gray-200 shadow-md transition-all duration-1000 ease-out ${pointColors[index]}`}
-                  style={{ transform: isAnimated ? "scale(1)" : "scale(0)", transitionDelay: `${index * 200 + 500}ms` }}
-                >
-                  {point.label === "Aujourd'hui" && (
-                    <div
-                      className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1 bg-red-500 text-white text-sm font-semibold rounded-md shadow-lg whitespace-nowrap transition-all duration-500 ease-out ${isAnimated ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}
-                      style={{ transitionDelay: "700ms" }}
-                    >
-                      Aujourd'hui
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-[6px] border-t-red-500"></div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-          <div
-            className={`absolute px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-md shadow-lg transition-all duration-700 ease-out ${isAnimated ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-            style={{ right: "0%", top: "-35px", transform: "translateX(10px)", transitionDelay: "1800ms" }}
-          >
-            Après avoir utilisé Liven
-            <div className="absolute top-full right-[15px] w-0 h-0 border-x-4 border-x-transparent border-t-[6px] border-t-green-500"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Axe des X */}
-      <div className="relative w-full border-t border-gray-200 pt-3 mt-4">
-        <div className="flex justify-between">
-          {chartData.map((point) => (
-            <div key={point.week} className="text-xs text-gray-500 font-medium uppercase">
-              SEMAINE {point.week}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <p className="text-center text-xs text-gray-400 mt-4">
-        Le graphique est une illustration non personnalisée et les résultats peuvent varier
-      </p>
-    </div>
-  )
-}
-
-// --- Le composant de contenu principal de la page ---
 function Step38Content() {
-  const searchParams = useSearchParams()
   const router = useRouter()
-  const name = searchParams.get("name") || "Utilisateur"
+  const searchParams = useSearchParams()
+  const [selectedActivities, setSelectedActivities] = useState<string[]>([])
 
+  const activitiesOptions = [
+    { id: "exploring", emoji: "🏞️", text: "Exploring new places and adventures" },
+    { id: "walks_talks", emoji: "🧑‍🤝‍🧑", text: "Long walks and talks" },
+    { id: "cozy_home", emoji: "🏡", text: "Cozy moments at home" },
+    { id: "movies_shows", emoji: "🎬", text: "Watching movies and shows" },
+    { id: "fun_activities", emoji: "🏂", text: "Engaging in fun activities" },
+    { id: "fitness_sports", emoji: "🏋️", text: "Fitness or sports activities" },
+    { id: "parties_events", emoji: "🥳", text: "Parties or social events" },
+  ]
+
+  const currentStep = 31
+  const totalSteps = 38
+  const progressPercentage = (currentStep / totalSteps) * 100
+
+  const handleSelect = (optionId: string) => {
+    setSelectedActivities((prev) =>
+      prev.includes(optionId)
+        ? prev.filter((id) => id !== optionId)
+        : [...prev, optionId]
+    )
+  }
+
+  // --- FUNÇÃO handleContinue SIMPLIFICADA E CORRIGIDA ---
   const handleContinue = () => {
-    const currentParams = new URLSearchParams(searchParams.toString())
-    router.push(`/quiz/step-39?${currentParams.toString()}`)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("enjoyed_activities", selectedActivities.join(","))
+    
+    // Aponte diretamente para a página única da etapa 39
+    router.push(`/quiz/step-39?${params.toString()}`)
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f6f2] flex flex-col items-center justify-center p-4 font-sans">
-      <div className="w-full max-w-lg mx-auto text-center space-y-8">
-        {/* Logo */}
-        <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mx-auto mb-8">
-          <div className="w-6 h-6 bg-white rounded-full"></div>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2"><BackArrowIcon /></button>
+        <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={120} height={35} priority />
+        <span className="font-semibold text-gray-700 w-12 text-right">{String(currentStep).padStart(2, "0")} / {totalSteps}</span>
+      </header>
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full bg-gray-200 rounded-full h-1">
+          <div className="bg-purple-500 h-1 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
         </div>
-
-        {/* Titre */}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-gray-800">{name},</h1>
-          <div className="text-xl text-gray-800">
-            Votre <span className="text-green-600 font-semibold">Programme de Gestion du Bien-être</span>
-            <br />
-            personnalisé est prêt !
+      </div>
+      <main className="flex-grow flex flex-col items-center p-6 text-center overflow-y-auto">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800">How did you enjoy spending time together?</h1>
+          <p className="text-gray-500 mb-6">(Choose all that apply)</p>
+          <div className="space-y-3">
+            {activitiesOptions.map((option) => {
+              const isSelected = selectedActivities.includes(option.id)
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => handleSelect(option.id)}
+                  className={`w-full p-3 rounded-full flex justify-between items-center transition-colors duration-200 ${
+                    isSelected ? "bg-blue-100" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{option.emoji}</span>
+                    <span className={`font-semibold text-left ${isSelected ? "text-blue-700" : "text-gray-700"}`}>{option.text}</span>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300 bg-white"
+                    }`}
+                  >
+                    {isSelected && <span className="text-white text-sm">✔</span>}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
-
-        {/* Section du graphique */}
-        <WellbeingChart />
-
-        {/* Bouton Continuer */}
-        <Button
-          onClick={handleContinue}
-          className="w-full max-w-md bg-green-600 hover:bg-green-700 text-white py-3 rounded-full text-lg font-medium transition-colors"
-        >
-          Continuer
-        </Button>
-      </div>
+      </main>
+      <footer className="w-full p-4 bg-gray-100 border-t border-gray-200">
+        <div className="w-full max-w-md mx-auto">
+          <button
+            onClick={handleContinue}
+            disabled={selectedActivities.length === 0}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Continue
+          </button>
+        </div>
+      </footer>
     </div>
   )
 }
 
-// --- L'exportation et le wrapper Suspense ---
 export default function Step38() {
   return (
-    <Suspense fallback={<Step38Loading />}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step38Content />
     </Suspense>
-  )
-}
-
-// --- Le composant de squelette de chargement ---
-function Step38Loading() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl mx-auto text-center space-y-8">
-        <Skeleton className="w-12 h-12 rounded-lg mx-auto" />
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-32 mx-auto" />
-          <Skeleton className="h-6 w-80 mx-auto" />
-          <Skeleton className="h-6 w-24 mx-auto" />
-        </div>
-        <div className="bg-white rounded-lg p-8 shadow-sm">
-          <Skeleton className="h-6 w-48 mx-auto mb-8" />
-          <Skeleton className="h-64 w-full mb-4" />
-          <Skeleton className="h-4 w-96 mx-auto" />
-        </div>
-        <Skeleton className="h-12 w-full max-w-md mx-auto rounded-full" />
-      </div>
-    </div>
   )
 }

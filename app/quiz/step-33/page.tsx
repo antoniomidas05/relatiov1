@@ -1,309 +1,98 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
-import { ArrowLeft, BatteryCharging, Calendar, Zap, Info } from "lucide-react"
-import Link from "next/link"
+import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { QuizLayout } from "@/components/quiz-layout"
 import Image from "next/image"
+
+// Componente de Ícone
+const BackArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
 
 function Step33Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const query = searchParams.toString()
-  const [animatedLevel, setAnimatedLevel] = useState(0)
+  const gender = searchParams.get("gender")
 
-  // Récupère le genre pour l'image de profil
-  const gender = searchParams.get("gender") || "male"
-  const age = searchParams.get("age") || "18-24"
-
-  const getProfileImage = (gender: string, age: string) => {
-    let ageRangeSuffix = ""
-
-    if (age === "18-24") {
-      ageRangeSuffix = "18-24"
-    } else if (age === "25-34") {
-      ageRangeSuffix = "25-34"
-    } else if (age === "35-44" || age === "45-54") {
-      ageRangeSuffix = "35-54"
-    } else if (age === "55-64") {
-      ageRangeSuffix = "55-65"
-    } else if (age === "65") {
-      ageRangeSuffix = "65"
-    }
-
-    if (gender === "female") {
-      return `/images/female-${ageRangeSuffix}-bad.avif`
-    } else {
-      return `/images/male-${ageRangeSuffix}-bad.avif`
-    }
-  }
-
-  // Système de notation amélioré basé sur les réponses réelles du quiz
-  const calculateWellbeingProfile = () => {
-    let score = 0
-    let mainDifficulty = "Faible énergie"
-    let challengingPeriod = "Quelques mois"
-    let trigger = "Raison personnelle"
-    let energyLevel = "Moyen"
-
-    // Collecter toutes les réponses des searchParams
-    const allParams = Object.fromEntries(searchParams.entries())
-    console.log("Toutes les réponses du quiz :", allParams) // Pour le débogage
-
-    // Mapper les réponses indiquant des problèmes élevés
-    const highStressIndicators = [
-      "very-stressed", "extremely-stressed", "always-stressed", "severe-stress", "very-anxious",
-      "extremely-anxious", "panic-attacks", "constant-worry", "very-tired", "exhausted", "no-energy",
-      "chronic-fatigue", "very-sad", "depressed", "hopeless", "suicidal-thoughts", "never-sleep",
-      "insomnia", "sleep-disorders", "nightmares", "very-angry", "rage", "irritable", "aggressive",
-      "overwhelmed", "burnout", "breakdown", "crisis", "isolated", "lonely", "no-support",
-      "relationship-problems", "financial-stress", "job-stress", "health-problems", "family-issues",
-    ]
-
-    // Mapper les réponses indiquant des problèmes moyens
-    const mediumStressIndicators = [
-      "stressed", "somewhat-stressed", "moderate-stress", "occasional-stress", "anxious", "worried",
-      "nervous", "tense", "tired", "low-energy", "fatigue", "drained", "sad", "down", "moody",
-      "emotional", "sleep-issues", "restless-sleep", "wake-up-tired", "irritated", "frustrated",
-      "impatient", "pressure", "demanding", "challenging", "relationship-tension", "work-pressure",
-      "some-support",
-    ]
-
-    // Mapper les réponses indiquant des problèmes faibles
-    const lowStressIndicators = [
-      "calm", "relaxed", "peaceful", "content", "happy", "positive", "optimistic", "good-mood",
-      "energetic", "rested", "refreshed", "active", "good-sleep", "restful-sleep", "sleep-well",
-      "patient", "understanding", "balanced", "manageable", "under-control", "stable",
-      "good-relationships", "supportive", "connected",
-    ]
-
-    // Analyser chaque réponse
-    Object.values(allParams).forEach((response) => {
-      if (!response || response === "gender" || response === "age") return
-
-      const responseStr = response.toString().toLowerCase()
-
-      if (highStressIndicators.some((indicator) => responseStr.includes(indicator))) {
-        score += 20
-      } else if (mediumStressIndicators.some((indicator) => responseStr.includes(indicator))) {
-        score += 12
-      } else if (lowStressIndicators.some((indicator) => responseStr.includes(indicator))) {
-        score += 3
-      } else {
-        score += 6
-      }
-    })
-
-    // Ajuster le score en fonction du nombre de réponses pour éviter les biais
-    const responseCount = Object.keys(allParams).length - 2 // Exclure gender et age
-    if (responseCount > 0) {
-      score = Math.round((score / responseCount) * 10) // Normaliser sur une échelle de 0 à 100
-    }
-
-    // Ajouter des facteurs spécifiques basés sur des combinaisons
-    const hasAnxiety = Object.values(allParams).some((v) => v.toString().toLowerCase().includes("anxious") || v.toString().toLowerCase().includes("worry") || v.toString().toLowerCase().includes("panic"))
-    const hasSleepIssues = Object.values(allParams).some((v) => v.toString().toLowerCase().includes("sleep") || v.toString().toLowerCase().includes("insomnia") || v.toString().toLowerCase().includes("tired"))
-    const hasRelationshipIssues = Object.values(allParams).some((v) => v.toString().toLowerCase().includes("relationship") || v.toString().toLowerCase().includes("family") || v.toString().toLowerCase().includes("isolated"))
-    const hasWorkStress = Object.values(allParams).some((v) => v.toString().toLowerCase().includes("work") || v.toString().toLowerCase().includes("job") || v.toString().toLowerCase().includes("career"))
-
-    // Bonus de score pour les combinaisons problématiques
-    if (hasAnxiety && hasSleepIssues) score += 15
-    if (hasRelationshipIssues && hasAnxiety) score += 10
-    if (hasWorkStress && hasSleepIssues) score += 12
-
-    console.log("Score calculé :", score) // Pour le débogage
-
-    // Déterminer le profil en fonction du score ajusté
-    if (score >= 70) {
-      mainDifficulty = hasAnxiety ? "Anxiété" : hasSleepIssues ? "Troubles du sommeil" : "Irritabilité"
-      challengingPeriod = "Quelques semaines"
-      trigger = hasRelationshipIssues ? "Famille ou relations" : hasWorkStress ? "Pression professionnelle" : "Raison personnelle"
-      energyLevel = "Faible"
-      return {
-        level: "High",
-        percentage: 85,
-        score: score,
-        mainDifficulty,
-        challengingPeriod,
-        trigger,
-        energyLevel,
-        message: "Cela signifie que vous pouvez ressentir une inquiétude accrue, un sentiment de pression, une baisse d'énergie et des perturbations de votre sommeil.",
-      }
-    } else if (score >= 35) {
-      mainDifficulty = hasAnxiety && hasSleepIssues ? "Combiné" : hasAnxiety ? "Rumination mentale" : "Gestion du stress"
-      challengingPeriod = hasWorkStress ? "Quelques mois" : "Quelques années"
-      trigger = hasRelationshipIssues ? "Famille ou relations" : "Raison personnelle"
-      energyLevel = hasSleepIssues ? "Faible" : "Moyen"
-      return {
-        level: "Medium",
-        percentage: 60,
-        score: score,
-        mainDifficulty,
-        challengingPeriod,
-        trigger,
-        energyLevel,
-        message: "Cela signifie que vous pouvez occasionnellement vous sentir inquiet(e), ressentir une certaine pression, remarquer une légère baisse d'énergie et avoir de légères perturbations de votre sommeil.",
-      }
-    } else {
-      mainDifficulty = "Rumination mentale"
-      challengingPeriod = "Toute la vie"
-      trigger = "Raison personnelle"
-      energyLevel = "Moyen"
-      return {
-        level: "Normal",
-        percentage: 35,
-        score: score,
-        mainDifficulty,
-        challengingPeriod,
-        trigger,
-        energyLevel,
-        message: "Cela signifie que vous pourriez rarement vous sentir un peu inquiet(e), rencontrer une légère pression, maintenir une énergie stable et profiter de habitudes de sommeil généralement constantes.",
-      }
-    }
-  }
-
-  const wellbeingProfile = calculateWellbeingProfile()
-  const profileImage = getProfileImage(gender, age)
-
-  // Animation du thermomètre
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedLevel(wellbeingProfile.percentage)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [wellbeingProfile.percentage])
+  const isFemaleUser = gender === "female"
+  const partnerPronoun = isFemaleUser ? "him" : "her"
+  const otherPartnerGender = isFemaleUser ? "woman" : "man"
 
   const handleContinue = () => {
-    router.push(`/quiz/step-34?${query}`)
+    router.push(`/quiz/step-34?${searchParams.toString()}`)
   }
-
-  const getLevelColors = (level: string) => {
-    switch (level) {
-      case "High": return { bg: "bg-red-50 border-red-200", text: "text-red-600", dot: "bg-red-500" }
-      case "Medium": return { bg: "bg-orange-50 border-orange-200", text: "text-orange-600", dot: "bg-orange-500" }
-      case "Normal": return { bg: "bg-green-50 border-green-200", text: "text-green-600", dot: "bg-green-500" }
-      default: return { bg: "bg-blue-50 border-blue-200", text: "text-blue-600", dot: "bg-blue-500" }
-    }
-  }
-
-  const levelTranslations: { [key: string]: string } = {
-    High: "ÉLEVÉ",
-    Medium: "MOYEN",
-    Normal: "NORMAL",
-  }
-  
-  const colors = getLevelColors(wellbeingProfile.level)
 
   return (
-    <QuizLayout step={26} totalSteps={26}>
-      <header className="w-full px-6 py-4 flex justify-between items-center absolute top-0 left-0 right-0 bg-[#f5f3f0] z-10">
-        <Link href={`/quiz/step-32?${query}`} className="p-2">
-          <ArrowLeft className="w-6 h-6 text-black" />
-        </Link>
-        <div className="flex items-center gap-2"></div>
-        <span className="text-gray-600 text-sm font-medium">26/26</span>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2"><BackArrowIcon /></button>
+        <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={120} height={35} priority />
+        <div className="w-10"></div>
       </header>
-      <main className="flex flex-col items-center justify-center px-3 pt-1 pb-2 max-w-2xl mx-auto mt-4">
-        <div className="text-center space-y-6 mb-12">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Résumé de votre profil de bien-être</h1>
-        </div>
+      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-full max-w-md flex flex-col items-center">
+          <p className="text-gray-800 text-lg max-w-sm mb-8 leading-relaxed">
+            Every day of <span className="text-red-500 font-semibold">inactivity</span> or sending the <span className="text-red-500 font-semibold">wrong signals</span> to your Ex damage your chances to get {partnerPronoun} back, and you will risk losing {partnerPronoun} to another {otherPartnerGender}...forever
+          </p>
 
-        <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Niveau des effets négatifs</h2>
-          <div className="relative w-full h-48 mb-4">
+          {/* --- CONTAINER DO GRÁFICO REFEITO --- */}
+          <div className="relative w-full max-w-[400px] mx-auto">
+            {/* Imagem de fundo */}
             <Image
-              src={profileImage || "/placeholder.svg"}
-              alt="Personnage de profil"
-              width={200}
-              height={200}
-              className="absolute top-0 left-1/2 -translate-x-1/2 h-full object-contain"
+              src="/step33/risk_graph.webp"
+              alt="Risk graph showing decreasing chances over time"
+              width={400}
+              height={225}
+              className="w-full h-auto"
               priority
             />
-
-            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gray-200 rounded-full overflow-hidden flex">
-              <div className="flex-1 bg-blue-300"></div>
-              <div className="flex-1 bg-green-400"></div>
-              <div className="flex-1 bg-orange-400"></div>
-              <div className="flex-1 bg-red-500"></div>
+            
+            {/* --- Elemento "Now" --- */}
+            <div className="absolute top-[8%] left-[8%] transform -translate-x-1/2">
+              {/* Label */}
+              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md">
+                <span className="font-bold text-pink-500">Now</span>
+                {/* Seta do balão */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-white"></div>
+              </div>
+              {/* Círculo */}
+              <div className="w-6 h-6 bg-pink-500 rounded-full border-4 border-white shadow-sm"></div>
+              {/* Linha pontilhada */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 h-16 mt-1 border-l-2 border-dashed border-pink-400/70"></div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 h-6 bg-transparent rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gray-800 bg-opacity-30 rounded-full transition-all duration-2000 ease-out"
-                style={{ width: `${animatedLevel}%`, transitionDuration: "2000ms" }}
-              ></div>
-            </div>
-
-            <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 px-2 mt-8">
-              <span>Faible</span>
-              <span>Normal</span>
-              <span>Moyen</span>
-              <span>Élevé</span>
-            </div>
-
-            <div
-              className="absolute bottom-8 w-20 h-8 bg-gray-800 text-white text-xs font-medium rounded-md flex items-center justify-center transition-all duration-2000 ease-out"
-              style={{ left: `${Math.max(10, Math.min(animatedLevel - 10, 80))}%`, transitionDuration: "2000ms" }}
-            >
-              Votre niveau
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
-            </div>
-
-            <div
-              className={`absolute bottom-5 w-4 h-4 rounded-full border-2 border-white shadow-md transition-all duration-2000 ease-out ${colors.dot}`}
-              style={{ left: `${Math.max(2, Math.min(animatedLevel - 2, 94))}%`, transitionDuration: "2000ms" }}
-            ></div>
-          </div>
-
-          <div className={`flex items-start p-3 rounded-lg border ${colors.bg} text-sm`}>
-            <Info className={`w-5 h-5 mr-3 ${colors.text}`} />
-            <div>
-              <p className={`font-semibold ${colors.text}`}>
-                NIVEAU {levelTranslations[wellbeingProfile.level]} (Score: {wellbeingProfile.score})
-              </p>
-              <p className="text-gray-700">{wellbeingProfile.message}</p>
+            {/* --- Elemento "In 2 months" --- */}
+            <div className="absolute top-[48%] left-[82%] transform -translate-x-1/2">
+              {/* Label */}
+              <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-md whitespace-nowrap">
+                <span className="font-bold text-blue-500">In 2 months</span>
+                {/* Seta do balão */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-white"></div>
+              </div>
+              {/* Círculo */}
+              <div className="w-6 h-6 bg-blue-500 rounded-full border-4 border-white shadow-sm"></div>
+              {/* Linha pontilhada */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 h-8 mt-1 border-l-2 border-dashed border-blue-400/70"></div>
             </div>
           </div>
         </div>
-
-        <div className="w-full max-w-md grid grid-cols-2 gap-4 mb-8">
-          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col items-start gap-2">
-            <BatteryCharging className="w-6 h-6 text-teal-600" />
-            <p className="text-sm font-medium text-gray-800">Difficulté principale</p>
-            <p className="text-base font-semibold text-gray-900">{wellbeingProfile.mainDifficulty}</p>
-          </div>
-          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col items-start gap-2">
-            <Calendar className="w-6 h-6 text-teal-600" />
-            <p className="text-sm font-medium text-gray-800">Période difficile</p>
-            <p className="text-base font-semibold text-gray-900">{wellbeingProfile.challengingPeriod}</p>
-          </div>
-          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col items-start gap-2">
-            <Zap className="w-6 h-6 text-teal-600" />
-            <p className="text-sm font-medium text-gray-800">Déclencheur</p>
-            <p className="text-base font-semibold text-gray-900">{wellbeingProfile.trigger}</p>
-          </div>
-          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col items-start gap-2">
-            <BatteryCharging className="w-6 h-6 text-teal-600" />
-            <p className="text-sm font-medium text-gray-800">Niveau d'énergie</p>
-            <p className="text-base font-semibold text-gray-900">{wellbeingProfile.energyLevel}</p>
-          </div>
-        </div>
-
-        <button
-          onClick={handleContinue}
-          className="w-full max-w-sm bg-green-600 hover:bg-green-700 text-white font-medium py-4 px-8 rounded-full text-lg transition-colors"
-        >
-          Continuer
-        </button>
       </main>
-    </QuizLayout>
+      <footer className="w-full p-4 bg-gray-100">
+        <div className="w-full max-w-md mx-auto">
+          <button onClick={handleContinue} className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity">
+            Continue
+          </button>
+        </div>
+      </footer>
+    </div>
   )
 }
 
 export default function Step33() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step33Content />
     </Suspense>
   )

@@ -1,130 +1,82 @@
 "use client"
 
-import { useState, Suspense } from "react"
-import { ArrowLeft, Brain, Sprout, Target, MessageCircleQuestion, Heart, Check, Bed } from "lucide-react"
-import Link from "next/link"
+import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { QuizLayout } from "@/components/quiz-layout"
+import Image from "next/image"
+
+// Componente de Ícone
+const BackArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
 
 function Step26Content() {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([])
   const router = useRouter()
   const searchParams = useSearchParams()
-  // Récupère les paramètres de l'URL
-  const gender = searchParams.get("gender") || "male"
-  const age = searchParams.get("age") || ""
-  const tiredness = searchParams.get("tiredness") || ""
-  const lastMinute = searchParams.get("lastMinute") || ""
-  const distraction = searchParams.get("distraction") || ""
-  const worried = searchParams.get("worried") || ""
-  const moodSwings = searchParams.get("moodSwings") || ""
-  const harmony = searchParams.get("harmony") || ""
-  const emotions = searchParams.get("emotions") || ""
-  const overwhelmed = searchParams.get("overwhelmed") || ""
-  const decision = searchParams.get("decision") || ""
-  const ambitions = searchParams.get("ambitions") || ""
-  const compliments = searchParams.get("compliments") || ""
-  const insecure = searchParams.get("insecure") || ""
-  const overthinkPartner = searchParams.get("overthinkPartner") || ""
-  const prioritizeOthers = searchParams.get("prioritizeOthers") || ""
-  const motivated = searchParams.get("motivated") || ""
-  const aspects = searchParams.get("aspects") || ""
-  const morningRoutine = searchParams.get("morningRoutine") || ""
-  const physicalActivity = searchParams.get("physicalActivity") || ""
-  const habits = searchParams.get("habits") || ""
-  const sleepImprovements = searchParams.get("sleepImprovements") || ""
-  const struggles = searchParams.get("struggles") || ""
-  const improvements = searchParams.get("improvements") || ""
+  // Lendo o gênero para personalizar o texto da pergunta
+  const gender = searchParams.get("gender")
 
-  const handleOptionToggle = (optionText: string) => {
-    setSelectedOptions((prevSelected) =>
-      prevSelected.includes(optionText)
-        ? prevSelected.filter((item) => item !== optionText)
-        : [...prevSelected, optionText],
-    )
-  }
+  // Lógica para definir o pronome do parceiro(a)
+  const partnerPronoun = gender === "female" ? "him" : "her"
 
-  const handleContinue = () => {
-    const selectedWorkOn = selectedOptions.join(",")
-    router.push(
-      `/quiz/step-27?gender=${gender}&age=${age}&tiredness=${tiredness}&lastMinute=${lastMinute}&distraction=${distraction}&worried=${worried}&moodSwings=${moodSwings}&harmony=${harmony}&emotions=${emotions}&overwhelmed=${overwhelmed}&decision=${decision}&ambitions=${ambitions}&compliments=${compliments}&insecure=${insecure}&overthinkPartner=${overthinkPartner}&prioritizeOthers=${prioritizeOthers}&motivated=${motivated}&aspects=${aspects}&morningRoutine=${morningRoutine}&physicalActivity=${physicalActivity}&habits=${habits}&sleepImprovements=${sleepImprovements}&struggles=${struggles}&improvements=${improvements}&workOn=${selectedWorkOn}`,
-    )
-  }
-
-  const options = [
-    { text: "Arrêter de douter de moi", icon: Brain },
-    { text: "Développer ma résilience émotionnelle", icon: Sprout },
-    { text: "Fixer et atteindre des objectifs", icon: Target },
-    { text: "Arrêter de trop réfléchir", icon: MessageCircleQuestion },
-    { text: "Améliorer ma capacité à faire confiance", icon: Heart },
-    { text: "Améliorer ma routine quotidienne", icon: Bed },
+  const answerOptions = [
+    { id: "agree", emoji: "😢", text: "Agree" },
+    { id: "somehow_agree", emoji: "😔", text: "Somehow agree" },
+    { id: "disagree", emoji: "🤔", text: "Disagree" },
   ]
 
+  // A imagem mostra 22/37, mas manteremos a consistência com 38
+  const currentStep = 22
+  const totalSteps = 38
+  const progressPercentage = (currentStep / totalSteps) * 100
+
+  const handleSelectOption = (optionId: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("hesitate_to_text", optionId)
+    // --- LÓGICA DE ROTEAMENTO ATUALIZADA ---
+    const isFemale = gender === "female";
+    const nextStepUrl = isFemale 
+      ? "/quiz/step-27-m" 
+      : "/quiz/step-27-h";
+      
+    router.push(`${nextStepUrl}?${params.toString()}`);
+  };
+
   return (
-    // Utiliser QuizLayout pour la barre de progression, maintenant à l'étape 23/26
-    <QuizLayout step={23} totalSteps={26}>
-      <header className="w-full px-6 py-4 flex justify-between items-center absolute top-0 left-0 right-0 bg-[#f5f3f0] z-10">
-        <Link
-          href={`/quiz/step-25?gender=${gender}&age=${age}&tiredness=${tiredness}&lastMinute=${lastMinute}&distraction=${distraction}&worried=${worried}&moodSwings=${moodSwings}&harmony=${harmony}&emotions=${emotions}&overwhelmed=${overwhelmed}&decision=${decision}&ambitions=${ambitions}&compliments=${compliments}&insecure=${insecure}&overthinkPartner=${overthinkPartner}&prioritizeOthers=${prioritizeOthers}&motivated=${motivated}&aspects=${aspects}&morningRoutine=${morningRoutine}&physicalActivity=${physicalActivity}&habits=${habits}&sleepImprovements=${sleepImprovements}&struggles=${struggles}&improvements=${improvements}`}
-          className="p-2"
-        >
-          <ArrowLeft className="w-6 h-6 text-black" />
-        </Link>
-        <div className="flex items-center gap-2">{/* L'icône centrale peut être ajoutée ici si nécessaire */}</div>
-        <span className="text-gray-600 text-sm font-medium">23/26</span>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2"><BackArrowIcon /></button>
+        <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={120} height={35} priority />
+        <span className="font-semibold text-gray-700 w-12 text-right">{String(currentStep).padStart(2, "0")} / {totalSteps}</span>
       </header>
-      <main className="flex flex-col items-center justify-center px-3 pt-1 pb-2 max-w-2xl mx-auto mt-4">
-        <div className="text-center space-y-2 mb-12">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Sur quoi aimeriez-vous commencer à travailler
-            <br />
-            avec votre programme ?
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full bg-gray-200 rounded-full h-1">
+          <div className="bg-purple-500 h-1 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
+        </div>
+      </div>
+      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800 mb-8 leading-snug">
+            Sometimes, I want to text {partnerPronoun} and change my mind at the last second
           </h1>
-          <p className="text-gray-600 text-base">Choisissez tout ce qui s'applique</p>
-        </div>
-        <div className="w-full max-w-md space-y-4 mb-8">
-          {options.map((option) => {
-            const Icon = option.icon
-            const isSelected = selectedOptions.includes(option.text)
-            return (
-              <button
-                key={option.text}
-                onClick={() => handleOptionToggle(option.text)}
-                className={`w-full p-4 text-left text-lg font-medium rounded-lg border-2 transition-all duration-200 flex items-center justify-between gap-4 ${
-                  isSelected
-                    ? "border-teal-500 bg-white text-gray-800"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <Icon className={`w-6 h-6 ${isSelected ? "text-teal-500" : "text-gray-400"}`} />
-                  <span>{option.text}</span>
-                </div>
-                <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    isSelected ? "border-teal-500 bg-teal-500" : "border-gray-300 bg-white"
-                  }`}
-                >
-                  {isSelected && <Check className="w-4 h-4 text-white" />}
-                </div>
+          <div className="space-y-3">
+            {answerOptions.map((option) => (
+              <button key={option.id} onClick={() => handleSelectOption(option.id)} className="w-full p-4 rounded-full flex items-center gap-4 bg-white hover:bg-gray-50 transition-colors duration-200">
+                <span className="text-2xl">{option.emoji}</span>
+                <span className="font-semibold text-gray-700">{option.text}</span>
               </button>
-            )
-          })}
+            ))}
+          </div>
         </div>
-        <button
-          onClick={handleContinue}
-          className="w-full max-w-sm bg-green-600 hover:bg-green-700 text-white font-medium py-4 px-8 rounded-full text-lg transition-colors"
-        >
-          Continuer
-        </button>
       </main>
-    </QuizLayout>
+    </div>
   )
 }
 
 export default function Step26() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step26Content />
     </Suspense>
   )

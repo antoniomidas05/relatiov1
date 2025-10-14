@@ -1,260 +1,117 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
-// Composant Pop-up
-const PopupModal = ({ isOpen, question, onAnswer, onClose }) => {
-  if (!isOpen) return null
+// Componente de Ícone
+const BackArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
+
+function Step35Content() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const gender = searchParams.get("gender"); // Precisamos ler o gênero
+  const [selectedMemories, setSelectedMemories] = useState<string[]>([])
+
+  const sharedMemories = [
+    { id: "series_movies", emoji: "🍿", text: "Series or movies we loved to watch together" },
+    { id: "favorite_song", emoji: "🎵", text: "Our favorite song" },
+    { id: "favorite_place", emoji: "☕", text: "Our favorite place" },
+    { id: "first_met_place", emoji: "🏝️", text: "A specific place where we first met" },
+    { id: "hobby_activity", emoji: "⚽", text: "Shared hobby or activity" },
+    { id: "identical_bracelets", emoji: "🧑‍🤝‍🧑", text: "Identical bracelets" },
+    { id: "matching_tattoos", emoji: "😮", text: "Matching tattoos" },
+  ]
+
+  const currentStep = 28
+  const totalSteps = 38 // A imagem mostra /37, mas manteremos a consistência
+  const progressPercentage = (currentStep / totalSteps) * 100
+
+  const handleSelectMemory = (memoryId: string) => {
+    setSelectedMemories((prev) =>
+      prev.includes(memoryId)
+        ? prev.filter((id) => id !== memoryId)
+        : [...prev, memoryId]
+    )
+  }
+
+  const handleContinue = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("shared_memories", selectedMemories.join(","))
+    // --- LÓGICA DE ROTEAMENTO ATUALIZADA ---
+    const isFemale = gender === "female";
+    const nextStepUrl = isFemale 
+      ? "/quiz/step-36-m" 
+      : "/quiz/step-36-h";
+      
+    router.push(`${nextStepUrl}?${params.toString()}`);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Arrière-plan avec flou */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-
-      {/* Fenêtre modale */}
-      <div className="relative bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl animate-in zoom-in-95 duration-300">
-        <div className="text-center">
-          <p className="text-sm text-gray-600 mb-4">Pour continuer, veuillez préciser</p>
-          <h3 className="text-xl font-bold text-gray-900 mb-8 leading-tight">{question}</h3>
-
-          <div className="flex gap-4 justify-center">
-            <Button
-              onClick={() => onAnswer("no")}
-              variant="outline"
-              className="px-8 py-3 rounded-full bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 font-medium min-w-[100px]"
-            >
-              Non
-            </Button>
-            <Button
-              onClick={() => onAnswer("yes")}
-              variant="outline"
-              className="px-8 py-3 rounded-full bg-gray-100 hover:bg-gray-200 border-0 text-gray-700 font-medium min-w-[100px]"
-            >
-              Oui
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2"><BackArrowIcon /></button>
+        <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={120} height={35} priority />
+        <span className="font-semibold text-gray-700 w-12 text-right">{String(currentStep).padStart(2, "0")} / {totalSteps}</span>
+      </header>
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full bg-gray-200 rounded-full h-1">
+          <div className="bg-purple-500 h-1 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
         </div>
       </div>
+      <main className="flex-grow flex flex-col items-center p-6 text-center overflow-y-auto">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800 mb-8">What shared memories do you and your Ex have?</h1>
+          <div className="space-y-3">
+            {sharedMemories.map((memory) => {
+              const isSelected = selectedMemories.includes(memory.id)
+              return (
+                <button
+                  key={memory.id}
+                  onClick={() => handleSelectMemory(memory.id)}
+                  className={`w-full p-3 rounded-full flex justify-between items-center transition-colors duration-200 ${
+                    isSelected ? "bg-blue-100" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{memory.emoji}</span>
+                    <span className={`font-semibold text-left ${isSelected ? "text-blue-700" : "text-gray-700"}`}>{memory.text}</span>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300 bg-white"
+                    }`}
+                  >
+                    {isSelected && <span className="text-white text-sm">✔</span>}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </main>
+      <footer className="w-full p-4 bg-gray-100 border-t border-gray-200">
+        <div className="w-full max-w-md mx-auto">
+          <button
+            onClick={handleContinue}
+            disabled={selectedMemories.length === 0}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Continue
+          </button>
+        </div>
+      </footer>
     </div>
   )
 }
 
 export default function Step35() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  // États pour les barres de progression
-  const [goalsProgress, setGoalsProgress] = useState(0)
-  const [growthProgress, setGrowthProgress] = useState(0)
-  const [contentProgress, setContentProgress] = useState(0)
-  const [currentStep, setCurrentStep] = useState(0) // 0: objectifs, 1: croissance, 2: contenu
-
-  // États pour les pop-ups
-  const [showPopup, setShowPopup] = useState(false)
-  const [currentQuestion, setCurrentQuestion] = useState("")
-  const [popupAnswered, setPopupAnswered] = useState({
-    goals: false,
-    growth: false,
-    content: false,
-  })
-
-  // Questions des pop-ups
-  const questions = {
-    goals: "Avez-vous tendance à finir ce que vous commencez ?",
-    growth: "Connaissez-vous la tenue d'un journal pour l'auto-réflexion ?",
-    content: "Voulez-vous apprendre à développer des habitudes solides ?",
-  }
-
-  // Charger l'état des pop-ups depuis sessionStorage
-  useEffect(() => {
-    const savedState = sessionStorage.getItem("popupAnswered")
-    if (savedState) {
-      setPopupAnswered(JSON.parse(savedState))
-    }
-  }, [])
-
-  // Sauvegarder l'état des pop-ups dans sessionStorage
-  const savePopupState = (newState) => {
-    setPopupAnswered(newState)
-    sessionStorage.setItem("popupAnswered", JSON.stringify(newState))
-  }
-
-  // Fonction pour afficher le pop-up
-  const showPopupForStep = (step) => {
-    const stepNames = ["goals", "growth", "content"]
-    const stepName = stepNames[step]
-
-    if (!popupAnswered[stepName]) {
-      setCurrentQuestion(questions[stepName])
-      setShowPopup(true)
-      console.log(`Affichage du pop-up pour ${stepName}: ${questions[stepName]}`)
-    }
-  }
-
-  // Fonction pour gérer la réponse du pop-up
-  const handlePopupAnswer = (answer) => {
-    const stepNames = ["goals", "growth", "content"]
-    const stepName = stepNames[currentStep]
-
-    console.log(`L'utilisateur a répondu "${answer}" pour ${stepName}`)
-
-    const newState = {
-      ...popupAnswered,
-      [stepName]: true,
-    }
-    savePopupState(newState)
-    setShowPopup(false)
-  }
-
-  // Effet pour contrôler la progression des barres
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentStep === 0) {
-        // Chargement des Objectifs
-        setGoalsProgress((prev) => {
-          const newProgress = Math.min(prev + 2, 100)
-
-          // Afficher le pop-up à 50%
-          if (newProgress === 50) {
-            showPopupForStep(0)
-          }
-
-          // Quand Objectifs atteint 100%, commencer Domaines de croissance
-          if (newProgress === 100) {
-            setTimeout(() => setCurrentStep(1), 500)
-          }
-
-          return newProgress
-        })
-      } else if (currentStep === 1) {
-        // Chargement des Domaines de croissance
-        setGrowthProgress((prev) => {
-          const newProgress = Math.min(prev + 2, 100)
-
-          // Afficher le pop-up à 50%
-          if (newProgress === 50) {
-            showPopupForStep(1)
-          }
-
-          // Quand Domaines de croissance atteint 100%, commencer Contenu
-          if (newProgress === 100) {
-            setTimeout(() => setCurrentStep(2), 500)
-          }
-
-          return newProgress
-        })
-      } else if (currentStep === 2) {
-        // Chargement du Contenu
-        setContentProgress((prev) => {
-          const newProgress = Math.min(prev + 2, 100)
-
-          // Afficher le pop-up à 50%
-          if (newProgress === 50) {
-            showPopupForStep(2)
-          }
-
-          // Quand Contenu atteint 100%, rediriger
-          if (newProgress === 100) {
-            setTimeout(() => {
-              const params = new URLSearchParams(searchParams.toString())
-              router.push(`/quiz/step-36?${params.toString()}`)
-            }, 1000)
-          }
-
-          return newProgress
-        })
-      }
-    }, 50) // Mise à jour toutes les 50ms pour plus de fluidité
-
-    return () => clearInterval(interval)
-  }, [currentStep, router, searchParams, popupAnswered])
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-white/80 backdrop-blur-sm shadow-xl border-0">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Création de votre programme personnalisé</h1>
-            <p className="text-gray-600">
-              Nous analysons vos réponses pour créer le parcours de bien-être idéal pour vous
-            </p>
-          </div>
-
-          <div className="space-y-8">
-            {/* Progression des Objectifs */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Objectifs</span>
-                <span className="text-sm text-gray-500">{goalsProgress}%</span>
-              </div>
-              <Progress value={goalsProgress} className="h-3 bg-gray-200" />
-            </div>
-
-            {/* Progression des Domaines de croissance */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Domaines de croissance</span>
-                <span className="text-sm text-gray-500">{growthProgress}%</span>
-              </div>
-              <Progress value={growthProgress} className="h-3 bg-gray-200" />
-            </div>
-
-            {/* Progression du Contenu */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold text-gray-700">Contenu</span>
-                <span className="text-sm text-gray-500">{contentProgress}%</span>
-              </div>
-              <Progress value={contentProgress} className="h-3 bg-gray-200" />
-            </div>
-          </div>
-
-          <div className="mt-8 text-center">
-            <div className="inline-flex items-center space-x-2 text-sm text-gray-500">
-              <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-              <span>Analyse de votre profil bien-être...</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Fenêtre modale Pop-up */}
-      <PopupModal
-        isOpen={showPopup}
-        question={currentQuestion}
-        onAnswer={handlePopupAnswer}
-        onClose={() => setShowPopup(false)}
-      />
-
-      {/* CSS personnalisé pour les animations */}
-      <style jsx>{`
-        @keyframes zoom-in-95 {
-          0% {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        .animate-in {
-          animation-fill-mode: both;
-        }
-        
-        .zoom-in-95 {
-          animation-name: zoom-in-95;
-        }
-        
-        .duration-300 {
-          animation-duration: 300ms;
-        }
-      `}</style>
-    </div>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
+      <Step35Content />
+    </Suspense>
   )
 }

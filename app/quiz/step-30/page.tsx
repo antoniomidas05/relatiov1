@@ -1,159 +1,118 @@
 "use client"
 
-import { Suspense } from "react"
-import { ArrowLeft, Check } from "lucide-react"
-import Link from "next/link"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
-// Mock de QuizLayout pour que l'exemple fonctionne de manière autonome
-const QuizLayout = ({ children, step, totalSteps }: { children: React.ReactNode, step: number, totalSteps: number }) => (
-    <div className="bg-[#f5f3f0] min-h-screen">
-      {children}
-    </div>
-);
+// Componente de Ícone
+const BackArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+)
 
 function Step30Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const query = searchParams.toString();
-  
-  const handleContinue = () => {
-    router.push(`/quiz/step-31?${query}`)
+  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([])
+
+  const difficultiesOptions = [
+    { id: "routine_challenges", emoji: "😟", text: "New routine challenges" },
+    { id: "financial_adjustments", emoji: "😥", text: "Financial adjustments" },
+    { id: "shared_commitments", emoji: "🧐", text: "Shared commitments" },
+    { id: "family_questions", emoji: "😬", text: "Handling questions from family and friends" },
+    { id: "none", emoji: "🤔", text: "None of the above" },
+  ]
+
+  const currentStep = 25
+  const totalSteps = 38
+  const progressPercentage = (currentStep / totalSteps) * 100
+
+  const handleSelectDifficulty = (difficultyId: string) => {
+    setSelectedDifficulties((prev) => {
+      if (difficultyId === "none") {
+        return prev.includes("none") ? [] : ["none"]
+      }
+      const isSelected = prev.includes(difficultyId)
+      let newSelection = isSelected 
+        ? prev.filter((id) => id !== difficultyId)
+        : [...prev, difficultyId]
+      
+      return newSelection.filter((id) => id !== "none")
+    })
   }
-  
-  // Tableau pour générer les rayons du soleil de manière programmatique
-  const sunRayCount = 16;
+
+  const handleContinue = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("breakup_difficulties", selectedDifficulties.join(","))
+    router.push(`/quiz/step-31?${params.toString()}`)
+  }
 
   return (
-    <QuizLayout step={26} totalSteps={26}>
-      <header className="w-full px-6 py-4 flex justify-between items-center bg-[#f5f3f0] z-20">
-        <Link href={`/quiz/step-29?${query}`} className="p-2">
-          <ArrowLeft className="w-6 h-6 text-black" />
-        </Link>
-        <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-            <div className="w-5 h-5 bg-white rounded-full relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-3 h-3 bg-black rounded-full"></div>
-              </div>
-            </div>
-        </div>
-        <div className="w-10"></div> {/* Espaceur */}
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
+        <button onClick={() => router.back()} className="p-2"><BackArrowIcon /></button>
+        <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={120} height={35} priority />
+        <span className="font-semibold text-gray-700 w-12 text-right">{String(currentStep).padStart(2, "0")} / {totalSteps}</span>
       </header>
-
-      <main className="flex flex-col items-center justify-center px-3 pt-1 pb-2 max-w-2xl mx-auto mt-4">
-        <div className="relative w-48 h-48 mx-auto mb-8">
-          
-          {/* Éclat du soleil (couche arrière) */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 z-5"
-            style={{ backgroundImage: 'radial-gradient(circle, rgba(255, 223, 102, 0.4) 0%, rgba(255, 223, 102, 0) 70%)' }}
-          ></div>
-            
-          <Image
-            src="/images/humanBrain.png"
-            alt="Cerveau humain"
-            width={120}
-            height={120}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
-          />
-
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <marker id="arrowhead" markerWidth="3" markerHeight="4" refX="1.5" refY="2" orient="auto">
-                <polygon points="0 0, 3 2, 0 4" fill="currentColor" />
-              </marker>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="1" result="coloredBlur" />
-              </filter>
-            </defs>
-
-            <circle cx="50" cy="50" r="48" stroke="#e0e0e0" strokeWidth="1" strokeDasharray="3 3" />
-            
-            <g className="text-yellow-400 opacity-50">
-              {Array.from({ length: sunRayCount }).map((_, i) => {
-                const angle = (i * 360) / sunRayCount;
-                const startRadius = 30;
-                const endRadius = 48;
-                const x1 = 50 + startRadius * Math.cos((angle * Math.PI) / 180);
-                const y1 = 50 + startRadius * Math.sin((angle * Math.PI) / 180);
-                const x2 = 50 + endRadius * Math.cos((angle * Math.PI) / 180);
-                const y2 = 50 + endRadius * Math.sin((angle * Math.PI) / 180);
-                return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="0.5" />;
-              })}
-            </g>
-
-            <g filter="url(#glow)" opacity="0.6">
-                <path d="M 25 25 A 40 40 0 0 1 75 25" stroke="white" strokeWidth="5" strokeLinecap="round" />
-                <path d="M 75 75 A 40 40 0 0 1 25 75" stroke="white" strokeWidth="5" strokeLinecap="round" />
-            </g>
-
-            <g className="text-gray-400">
-                <path d="M 65 15 A 40 40 0 0 1 85 35" stroke="currentColor" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
-                <path d="M 85 65 A 40 40 0 0 1 65 85" stroke="currentColor" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
-                <path d="M 35 85 A 40 40 0 0 1 15 65" stroke="currentColor" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
-                <path d="M 15 35 A 40 40 0 0 1 35 15" stroke="currentColor" strokeWidth="1.5" markerEnd="url(#arrowhead)" />
-            </g>
-          </svg>
-          
-          {/* Étiquettes de texte */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700 whitespace-nowrap z-20 shadow-sm border border-gray-200">
-            Pensées
-          </div>
-          <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700 whitespace-nowrap z-20 shadow-sm border border-gray-200">
-            Sentiments
-          </div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700 whitespace-nowrap z-20 shadow-sm border border-gray-200">
-            Comportement
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full bg-gray-200 rounded-full h-1">
+          <div className="bg-purple-500 h-1 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
+        </div>
+      </div>
+      <main className="flex-grow flex flex-col items-center p-6 text-center">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800">What difficulties arose after the breakup?</h1>
+          <p className="text-gray-500 mb-6">(Choose all that apply)</p>
+          <div className="space-y-3">
+            {difficultiesOptions.map((option) => {
+              const isSelected = selectedDifficulties.includes(option.id)
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => handleSelectDifficulty(option.id)}
+                  // --- CORREÇÃO NA COR DE FUNDO DA OPÇÃO ---
+                  className={`w-full p-3 rounded-full flex justify-between items-center transition-colors duration-200 ${
+                    isSelected ? "bg-blue-100" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{option.emoji}</span>
+                    {/* --- CORREÇÃO NA COR DO TEXTO DA OPÇÃO --- */}
+                    <span className={`font-semibold text-left ${isSelected ? "text-blue-700" : "text-gray-700"}`}>{option.text}</span>
+                  </div>
+                  {/* --- CORREÇÃO NA COR DO CÍRCULO DE CHECK --- */}
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      isSelected ? "border-blue-500 bg-blue-500" : "border-gray-300 bg-white"
+                    }`}
+                  >
+                    {isSelected && <span className="text-white text-sm">✔</span>}
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </div>
-
-        {/* --- CONTENU RESTAURÉ ICI --- */}
-        <div className="text-center space-y-6 mb-8 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Votre programme sera examiné par notre <span className="text-teal-600">équipe scientifique</span>
-          </h1>
-          <p className="text-gray-500 text-sm italic">
-            "J'apprécie que Liven intègre des techniques éprouvées par la science pour fournir un contenu et des ressources personnalisés à ses utilisateurs. Cette approche améliore leur bien-être émotionnel."
-          </p>
-          
-          <div className="w-full p-3 bg-white rounded-lg shadow-sm border border-gray-200 text-left relative overflow-hidden">
-             <div className="absolute top-0 left-0 h-full w-1.5 bg-teal-300"></div>
-             <div className="absolute -top-4 -right-4 w-16 h-16 bg-teal-500/10 rounded-full"></div>
-             <div className="pl-4">
-                 <p className="text-xs font-semibold text-teal-600 mb-2">Contenu examiné par un expert</p>
-                 <div className="flex items-center gap-3">
-                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center">
-                        <Check className="w-5 h-5 text-white" />
-                     </div>
-                     <div>
-                       <p className="font-semibold text-gray-800 text-sm">Anieta Dixon, MA, SME</p>
-                       <p className="text-xs text-gray-500">Coach en état d'esprit</p>
-                     </div>
-                 </div>
-             </div>
-          </div>
-        </div>
-        
-        <button
-          onClick={handleContinue}
-          className="w-full max-w-sm bg-teal-600 hover:bg-teal-700 text-white font-medium py-3 px-8 rounded-full text-lg transition-colors"
-        >
-          Continuer
-        </button>
       </main>
-    </QuizLayout>
+      <footer className="w-full p-4 bg-gray-100 border-t border-gray-200">
+        <div className="w-full max-w-md mx-auto">
+          {/* --- CORREÇÃO NO BOTÃO "CONTINUE" --- */}
+          <button
+            onClick={handleContinue}
+            disabled={selectedDifficulties.length === 0}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            Continue
+          </button>
+        </div>
+      </footer>
+    </div>
   )
 }
 
 export default function Step30() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-100"></div>}>
       <Step30Content />
     </Suspense>
   )
