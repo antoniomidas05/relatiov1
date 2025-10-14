@@ -2,21 +2,21 @@
 
 "use server"
 
-// Interface para os dados que a action receberá
+// Interface para os dados
 interface SubmissionData {
   userEmail: string;
-  phoneNumber: string;
-  // Podemos adicionar outros campos do quiz aqui se quisermos enviá-los para o AC
+  phoneNumber?: string; // Tornando o telefone opcional
+  [key: string]: any;
 }
 
-// Função auxiliar para encontrar um contato (copiada da sua lógica)
+// Função auxiliar para encontrar contato
 async function findContactByEmail(email: string, apiUrl: string, apiToken: string) {
   const url = `${apiUrl}/api/3/contacts?email=${encodeURIComponent(email)}`
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: { "Api-Token": apiToken },
-      cache: 'no-store', // Importante para não cachear a busca
+      cache: 'no-store',
     });
     if (!response.ok) return null;
     const data = await response.json();
@@ -27,15 +27,14 @@ async function findContactByEmail(email: string, apiUrl: string, apiToken: strin
   }
 }
 
-// A Server Action principal
+// Server Action principal
 export async function subscribeToActiveCampaign(data: SubmissionData) {
   const { userEmail, phoneNumber } = data;
 
-  if (!userEmail || !phoneNumber) {
-    return { success: false, message: "E-mail e telefone são obrigatórios." };
+  if (!userEmail) { // Apenas o e-mail é obrigatório agora
+    return { success: false, message: "O e-mail é obrigatório." };
   }
 
-  // 1. Carregar variáveis de ambiente
   const API_URL = process.env.ACTIVE_CAMPAIGN_API_URL;
   const API_TOKEN = process.env.ACTIVE_CAMPAIGN_API_TOKEN;
   const TAG_ID = process.env.ACTIVE_CAMPAIGN_TAG_ID;
@@ -48,11 +47,20 @@ export async function subscribeToActiveCampaign(data: SubmissionData) {
   let contactId: string;
 
   try {
-    // 2. Tentar criar o contato
+    const createContactPayload: any = {
+      contact: {
+        email: userEmail,
+        status: 1
+      }
+    };
+    if (phoneNumber) {
+      createContactPayload.contact.phone = phoneNumber;
+    }
+
     const createContactResponse = await fetch(`${API_URL}/api/3/contacts`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Api-Token": API_TOKEN },
-      body: JSON.stringify({ contact: { email: userEmail, phone: phoneNumber, status: 1 } }),
+      body: JSON.stringify(createContactPayload),
     });
 
     const responseData = await createContactResponse.json();
@@ -74,7 +82,6 @@ export async function subscribeToActiveCampaign(data: SubmissionData) {
       throw new Error(`Falha ao criar/encontrar contato. Status: ${createContactResponse.status}`);
     }
 
-    // 3. Adicionar a tag ao contato
     console.log(`🚀 Adicionando TAG ID ${TAG_ID} ao CONTATO ID ${contactId}...`);
     const tagResponse = await fetch(`${API_URL}/api/3/contactTags`, {
       method: "POST",
@@ -85,7 +92,6 @@ export async function subscribeToActiveCampaign(data: SubmissionData) {
     if (!tagResponse.ok) {
       const tagErrorData = await tagResponse.json();
       console.error("❌ Erro ao adicionar tag no ActiveCampaign:", tagErrorData);
-      // Não lançar erro aqui, mas logar é importante
     } else {
       console.log("✅ Tag adicionada com sucesso!");
     }
