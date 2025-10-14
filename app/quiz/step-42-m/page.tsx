@@ -33,7 +33,7 @@ function Step42MContent() {
     const params = new URLSearchParams(searchParams.toString())
     params.set("honeymoon_vibe", imageId)
     // Aponte para a próxima página
-    router.push(`/quiz/step-43?${params.toString()}`)
+    router.push(`/quiz/step-43-m?${params.toString()}`)
   }
 
   return (

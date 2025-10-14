@@ -33,7 +33,7 @@ function Step42HContent() {
     const params = new URLSearchParams(searchParams.toString())
     params.set("relationship_vibe", imageId)
     // Aponte para a próxima página
-    router.push(`/quiz/step-43?${params.toString()}`)
+    router.push(`/quiz/step-43-h?${params.toString()}`)
   }
 
   return (
