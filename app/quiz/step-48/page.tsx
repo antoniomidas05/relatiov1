@@ -1,5 +1,3 @@
-// app/quiz/step-48/page.tsx
-
 "use client"
 
 import { useState, useTransition, Suspense } from "react"
@@ -10,13 +8,18 @@ import { subscribeToActiveCampaign } from "../action" // A importação está co
 function Step48Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  
+  // 1. Precisamos ler o gênero para a lógica de roteamento
+  const gender = searchParams.get("gender")
+
   const [userEmail, setUserEmail] = useState("")
   const [isPending, startTransition] = useTransition()
 
   const handleContinue = () => {
-    // Agora só precisamos enviar o e-mail, conforme o formulário
     const submissionData = { 
       userEmail, 
+      // Se você ainda tiver o telefone em algum lugar (ex: URL), pode adicionar aqui
+      // phoneNumber: searchParams.get("phoneNumber") || ""
     }
 
     startTransition(async () => {
@@ -24,7 +27,15 @@ function Step48Content() {
       if (result.success) {
         const finalParams = new URLSearchParams(searchParams.toString())
         finalParams.set("userEmail", userEmail)
-        router.push(`/thank-you?${finalParams.toString()}`)
+
+        // 2. Lógica de roteamento baseada no gênero
+        const isFemale = gender === "female"
+        const nextStepUrl = isFemale 
+          ? "/quiz/step-49-m" // Rota para mulheres
+          : "/quiz/step-49-h" // Rota para homens
+        
+        // 3. Redireciona para a URL correta
+        router.push(`${nextStepUrl}?${finalParams.toString()}`)
       } else {
         alert(result.message || "An error occurred. Please try again.")
       }
