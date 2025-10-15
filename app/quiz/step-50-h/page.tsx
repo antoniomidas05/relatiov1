@@ -17,8 +17,8 @@ const CheckIcon = () => (
 )
 
 const StarIcon = () => (
-  <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 17.27L18.18 21l-1.64-7.03L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+  <svg className="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   </svg>
 )
 
@@ -80,6 +80,33 @@ function Step50HContent() {
   const [timeLeft, setTimeLeft] = useState(10 * 60)
   const [selectedPlan, setSelectedPlan] = useState("4-week")
   const [openFaqId, setOpenFaqId] = useState<number | null>(1)
+
+  const plansRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // Prevent back navigation
+    const handlePopState = () => {
+      router.push("/quiz/email-h")
+    }
+
+    // Add a history entry to intercept back button
+    window.history.pushState(null, "", window.location.href)
+    window.addEventListener("popstate", handlePopState)
+
+    // Prevent page close/refresh
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      router.push("/quiz/email-h")
+      return ""
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [router])
 
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0)), 1000)
@@ -147,8 +174,6 @@ function Step50HContent() {
         "Complete daily tasks, provide feedback, and study materials. We have designed the plan in such a way that each day brings you closer to your goal, step by step.",
     },
   ]
-
-  const plansRef = useRef<HTMLDivElement>(null)
 
   const scrollToPlans = () => {
     plansRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })

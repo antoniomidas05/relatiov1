@@ -17,8 +17,8 @@ const CheckIcon = () => (
 )
 
 const StarIcon = () => (
-  <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 17.27L18.18 21l-1.64-7.03L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+  <svg className="w-5 h-5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   </svg>
 )
 
@@ -72,16 +72,41 @@ const AccordionItem = ({ title, children, isOpen, onClick }: any) => (
 
 // --- PÁGINA PRINCIPAL ---
 
-function Step50HContent() {
+function Step50MContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const exName = searchParams.get("exName") || "her"
+  const exName = searchParams.get("exName") || "him"
 
   const [timeLeft, setTimeLeft] = useState(10 * 60)
   const [selectedPlan, setSelectedPlan] = useState("4-week")
   const [openFaqId, setOpenFaqId] = useState<number | null>(1)
 
   const plansRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // Prevent back navigation
+    const handlePopState = () => {
+      router.push("/quiz/email-m")
+    }
+
+    // Add a history entry to intercept back button
+    window.history.pushState(null, "", window.location.href)
+    window.addEventListener("popstate", handlePopState)
+
+    // Prevent page close/refresh
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      router.push("/quiz/email-m")
+      return ""
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [router])
 
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0)), 1000)
@@ -182,7 +207,7 @@ function Step50HContent() {
       <div className="max-w-xl mx-auto p-4 space-y-12">
         <div className="space-y-4 pt-4">
           <Image
-            src="/step50/Offer_female.webp"
+            src="/step50/Offer_male.webp"
             alt="Couple"
             width={800}
             height={450}
@@ -221,7 +246,7 @@ function Step50HContent() {
           <h2 className="text-xl font-bold">Here is your Personal</h2>
           <h2 className="text-2xl font-bold text-blue-600 capitalize mb-4">Get "{exName}" Back Plan</h2>
           <Image
-            src="/step50/offer_plan_v2_female.webp"
+            src="/step50/offer_plan_v2_male.webp"
             alt="Plan progress graph"
             width={500}
             height={300}
@@ -474,10 +499,10 @@ function Step50HContent() {
   )
 }
 
-export default function Step50H() {
+export default function Step50M() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
-      <Step50HContent />
+      <Step50MContent />
     </Suspense>
   )
 }
