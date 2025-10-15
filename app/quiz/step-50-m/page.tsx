@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
@@ -18,7 +18,7 @@ const CheckIcon = () => (
 
 const StarIcon = () => (
   <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+    <path d="M12 17.27L18.18 21l-1.64-7.03L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
   </svg>
 )
 
@@ -81,6 +81,8 @@ function Step50HContent() {
   const [selectedPlan, setSelectedPlan] = useState("4-week")
   const [openFaqId, setOpenFaqId] = useState<number | null>(1)
 
+  const plansRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     const timer = setInterval(() => setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0)), 1000)
     return () => clearInterval(timer)
@@ -90,6 +92,10 @@ function Step50HContent() {
     .toString()
     .padStart(2, "0")
   const seconds = (timeLeft % 60).toString().padStart(2, "0")
+
+  const scrollToPlans = () => {
+    plansRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   const handleCheckout = () => {
     const checkoutUrls = {
@@ -166,7 +172,7 @@ function Step50HContent() {
           </p>
         </div>
         <button
-          onClick={handleCheckout}
+          onClick={scrollToPlans}
           className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-full text-base shadow-lg hover:opacity-90 transition-opacity"
         >
           GET MY PLAN
@@ -243,7 +249,7 @@ function Step50HContent() {
           </ul>
         </div>
 
-        <div className="space-y-4">
+        <div ref={plansRef} className="space-y-4">
           <div className="relative pt-4">
             <div className="absolute -top-0 left-1/2 -translate-x-1/2 w-40 bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-full text-center">
               most popular
@@ -430,56 +436,6 @@ function Step50HContent() {
               <p className="text-sm text-gray-600">{t.text}</p>
             </div>
           ))}
-        </div>
-
-        <div className="space-y-4">
-          <div className="relative pt-4">
-            <div className="absolute -top-0 left-1/2 -translate-x-1/2 w-40 bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-full text-center">
-              most popular
-            </div>
-            <PlanOption
-              duration="4-week plan"
-              price="0.99"
-              originalPrice="€2.00"
-              isSelected={selectedPlan === "4-week"}
-              onClick={() => setSelectedPlan("4-week")}
-            />
-          </div>
-          <PlanOption
-            duration="12-week plan"
-            price="0.56"
-            originalPrice="€1.12"
-            isSelected={selectedPlan === "12-week"}
-            onClick={() => setSelectedPlan("12-week")}
-          />
-          <PlanOption
-            duration="24-week plan"
-            price="0.44"
-            originalPrice="€0.88"
-            isSelected={selectedPlan === "24-week"}
-            onClick={() => setSelectedPlan("24-week")}
-          />
-          <button
-            onClick={handleCheckout}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 rounded-full text-xl hover:opacity-90 transition-opacity mt-6"
-          >
-            GET MY PLAN
-          </button>
-
-          <Image
-            src="/step50/pay-safe-and-secure.png"
-            alt="Payment methods"
-            width={300}
-            height={25}
-            className="mx-auto"
-          />
-          <p className="text-xs text-gray-500 text-center pt-2">
-            By clicking “Get My Plan” you agree to enroll in a monthly subscription to https://getrelatio.com/service...{" "}
-            <a href="#" className="underline">
-              Subscription Policy
-            </a>
-            .
-          </p>
         </div>
 
         <div className="space-y-4">
