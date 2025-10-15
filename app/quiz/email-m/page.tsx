@@ -97,9 +97,9 @@ function Step50HContent() {
 
   const handleCheckout = () => {
     const checkoutUrls = {
-      "4-week": "https://pay.hotmart.com/S102433548I?off=spm0k8ud&checkoutMode=6",
-      "12-week": "https://pay.hotmart.com/S102433548I?off=9fbzpe12&checkoutMode=6",
-      "24-week": "https://pay.hotmart.com/S102433548I?off=z434ypnk&checkoutMode=6",
+      "4-week": "https://pay.hotmart.com/S102433548I?off=811ryax0&checkoutMode=6",
+      "12-week": "https://pay.hotmart.com/S102433548I?off=obv1r9fy&checkoutMode=6",
+      "24-week": "https://pay.hotmart.com/S102433548I?off=evtti1ls&checkoutMode=6",
     }
     window.location.href = checkoutUrls[selectedPlan as keyof typeof checkoutUrls]
   }

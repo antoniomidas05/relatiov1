@@ -31,7 +31,7 @@ function Step49MContent() {
 
         <div className="relative w-full max-w-lg mx-auto my-8">
           <Image 
-            src="/step49/back_plan_graph_v2.webp" 
+            src="/step50/offer_plan_v2_male.png" 
             alt="Relationship progress graph" 
             width={600} 
             height={400} 
@@ -39,12 +39,6 @@ function Step49MContent() {
             priority
           />
           
-          <div className="absolute inset-0 text-xs sm:text-sm font-semibold text-gray-700">
-            <p className="absolute top-[60%] left-[5%] max-w-[25%] text-center">Your ex sees no future together</p>
-            <p className="absolute top-[50%] left-[28%] max-w-[25%] text-center">Your Ex starts thinking of you</p>
-            <p className="absolute top-[35%] left-[52%] max-w-[25%] text-center">She can't imagine her life without you</p>
-            <p className="absolute top-[20%] left-[72%] max-w-[25%] text-center">She does everything to get you back</p>
-          </div>
         </div>
       </main>
 
