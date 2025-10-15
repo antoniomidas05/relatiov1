@@ -91,6 +91,15 @@ function Step50HContent() {
     .padStart(2, "0")
   const seconds = (timeLeft % 60).toString().padStart(2, "0")
 
+  const handleCheckout = () => {
+    const checkoutUrls = {
+      "4-week": "https://pay.hotmart.com/S102433548I?off=spm0k8ud&checkoutMode=6",
+      "12-week": "https://pay.hotmart.com/S102433548I?off=9fbzpe12&checkoutMode=6",
+      "24-week": "https://pay.hotmart.com/S102433548I?off=z434ypnk&checkoutMode=6",
+    }
+    window.location.href = checkoutUrls[selectedPlan as keyof typeof checkoutUrls]
+  }
+
   const testimonials = [
     {
       image: "/step50/offer_kate_z.webp",
@@ -156,7 +165,10 @@ function Step50HContent() {
             {minutes}:{seconds}
           </p>
         </div>
-        <button className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-full text-base shadow-lg hover:opacity-90 transition-opacity">
+        <button
+          onClick={handleCheckout}
+          className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-3 px-8 rounded-full text-base shadow-lg hover:opacity-90 transition-opacity"
+        >
           GET MY PLAN
         </button>
       </div>
@@ -258,7 +270,10 @@ function Step50HContent() {
             isSelected={selectedPlan === "24-week"}
             onClick={() => setSelectedPlan("24-week")}
           />
-          <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 rounded-full text-xl hover:opacity-90 transition-opacity mt-6">
+          <button
+            onClick={handleCheckout}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 rounded-full text-xl hover:opacity-90 transition-opacity mt-6"
+          >
             GET MY PLAN
           </button>
 
@@ -315,9 +330,7 @@ function Step50HContent() {
             </li>
             <li className="flex items-start gap-4">
               <CheckIcon />
-              <span>
-                Knowledge and skills to prevent toxic behavior in the future
-              </span>
+              <span>Knowledge and skills to prevent toxic behavior in the future</span>
             </li>
           </ul>
 
@@ -384,21 +397,39 @@ function Step50HContent() {
           <div className="text-center">
             <h3 className="text-3xl font-bold">
               <span className="text-blue-500">Women </span>
-              <span className="bg-gradient-to-r from-blue-500 to-pink-500 text-transparent bg-clip-text"> Relatio
-              </span>
+              <span className="bg-gradient-to-r from-blue-500 to-pink-500 text-transparent bg-clip-text"> Relatio</span>
             </h3>
           </div>
         </div>
 
         <div className="space-y-4">
-            {testimonials.map((t, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md border p-4 text-left">
-                    <div className="flex items-center gap-3 mb-2"><Image src={t.image} alt={t.name} width={40} height={40} className="rounded-full" /><div><p className="font-bold">{t.name}</p><p className="text-xs text-gray-500">{t.location}</p></div><div className="ml-auto text-xs text-gray-400">{t.time}</div></div>
-                    <div className="flex text-green-500 mb-2"><StarIcon/><StarIcon/><StarIcon/><StarIcon/><StarIcon/></div>
-                    <h3 className="font-bold text-lg mb-1">{t.title}</h3>
-                    <p className="text-sm text-gray-600">{t.text}</p>
+          {testimonials.map((t, i) => (
+            <div key={i} className="bg-white rounded-lg shadow-md border p-4 text-left">
+              <div className="flex items-center gap-3 mb-2">
+                <Image
+                  src={t.image || "/placeholder.svg"}
+                  alt={t.name}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+                <div>
+                  <p className="font-bold">{t.name}</p>
+                  <p className="text-xs text-gray-500">{t.location}</p>
                 </div>
-            ))}
+                <div className="ml-auto text-xs text-gray-400">{t.time}</div>
+              </div>
+              <div className="flex text-green-500 mb-2">
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+                <StarIcon />
+              </div>
+              <h3 className="font-bold text-lg mb-1">{t.title}</h3>
+              <p className="text-sm text-gray-600">{t.text}</p>
+            </div>
+          ))}
         </div>
 
         <div className="space-y-4">
@@ -428,7 +459,10 @@ function Step50HContent() {
             isSelected={selectedPlan === "24-week"}
             onClick={() => setSelectedPlan("24-week")}
           />
-          <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 rounded-full text-xl hover:opacity-90 transition-opacity mt-6">
+          <button
+            onClick={handleCheckout}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 rounded-full text-xl hover:opacity-90 transition-opacity mt-6"
+          >
             GET MY PLAN
           </button>
 
