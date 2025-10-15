@@ -207,7 +207,7 @@ function Step50MContent() {
       <div className="max-w-xl mx-auto p-4 space-y-12">
         <div className="space-y-4 pt-4">
           <Image
-            src="/step50/Offer_male.webp"
+            src="/step50/Offer_female.webp"
             alt="Couple"
             width={800}
             height={450}
@@ -246,7 +246,7 @@ function Step50MContent() {
           <h2 className="text-xl font-bold">Here is your Personal</h2>
           <h2 className="text-2xl font-bold text-blue-600 capitalize mb-4">Get "{exName}" Back Plan</h2>
           <Image
-            src="/step50/offer_plan_v2_male.webp"
+            src="/step50/offer_plan_v2_female.webp"
             alt="Plan progress graph"
             width={500}
             height={300}
