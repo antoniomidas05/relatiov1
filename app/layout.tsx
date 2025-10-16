@@ -6,8 +6,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Liven - Personalized Well-being Quiz",
-  description: "A personalized well-being management plan quiz",
+  title: "Relatio - Don't let the person you love slip out of your life forever",
+  description: "A personalized management plan quiz",
   generator: "v0.dev",
 }
 
