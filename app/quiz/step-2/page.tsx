@@ -5,40 +5,27 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 
-// Componente para o ícone de seta para voltar
+// --- COMPONENTES DE ÍCONES (sem alterações) ---
 const BackArrowIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 text-gray-700"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
 )
 
-// Componente para o ícone de verificação (check)
 const CheckIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 text-white"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-      clipRule="evenodd"
-    />
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
   </svg>
 )
+
 
 function Step2Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [selectedAge, setSelectedAge] = useState<string>("18-29")
+  
+  // MUDANÇA 1: Estado inicial é 'null'
+  // Nenhuma opção começa selecionada. O tipo é ajustado para aceitar 'null'.
+  const [selectedAge, setSelectedAge] = useState<string | null>(null)
 
   const ageOptions = ["18-29", "30-44", "45-54", "55+"]
   const currentStep = 2
@@ -46,15 +33,16 @@ function Step2Content() {
   const progressPercentage = (currentStep / totalSteps) * 100
 
   const handleContinue = () => {
-    // A sua lógica aqui já estava correta!
+    if (!selectedAge) return // Proteção extra para não continuar sem seleção
+    
     const params = new URLSearchParams(searchParams.toString())
     params.set("age", selectedAge)
     router.push(`/quiz/step-3?${params.toString()}`)
   }
 
   return (
+    // O container principal ainda controla o layout geral
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* --- CABEÇALHO (Adicionado de volta) --- */}
       <header className="flex items-center justify-between p-4 w-full max-w-md mx-auto">
         <button onClick={() => router.back()} className="p-2">
           <BackArrowIcon />
@@ -71,7 +59,6 @@ function Step2Content() {
         </span>
       </header>
 
-      {/* --- BARRA DE PROGRESSO (Adicionada de volta) --- */}
       <div className="w-full max-w-md mx-auto px-4">
         <div className="w-full bg-gray-200 rounded-full h-1">
           <div
@@ -81,8 +68,12 @@ function Step2Content() {
         </div>
       </div>
 
-      {/* --- CONTEÚDO PRINCIPAL (Adicionado de volta) --- */}
-      <main className="flex-grow flex flex-col items-center p-6 text-center">
+      {/* 
+        MUDANÇA 2.2: Adicionado padding-bottom ('pb-28') ao 'main'.
+        Isso cria um espaço vazio na parte inferior do conteúdo, garantindo que
+        a última opção não fique escondida atrás do rodapé fixo.
+      */}
+      <main className="flex-grow flex flex-col items-center p-6 text-center pb-28">
         <div className="w-full max-w-md">
           <h1 className="text-2xl font-bold text-gray-800 mb-3">
             What's your age?
@@ -103,8 +94,8 @@ function Step2Content() {
                 onClick={() => setSelectedAge(age)}
                 className={`w-full p-4 rounded-full flex justify-between items-center transition-all duration-200 ${
                   selectedAge === age
-                    ? "bg-blue-100 border border-blue-500"
-                    : "bg-white border border-transparent hover:bg-gray-50"
+                    ? "bg-blue-100 border border-blue-500" // Estilo de selecionado
+                    : "bg-white border border-transparent hover:bg-gray-50" // Estilo padrão
                 }`}
               >
                 <span
@@ -125,12 +116,17 @@ function Step2Content() {
         </div>
       </main>
 
-      {/* --- RODAPÉ COM BOTÃO DE CONTINUAR (Já estava correto) --- */}
-      <footer className="w-full p-4 bg-gray-100">
+      {/* 
+        MUDANÇA 2.1: Rodapé com posicionamento fixo.
+        - 'fixed bottom-0 left-0' prende o rodapé na parte inferior da tela.
+        - 'bg-white/80 backdrop-blur-sm border-t' cria um efeito visual moderno
+          que se destaca do conteúdo que pode rolar por trás.
+      */}
+      <footer className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
         <div className="w-full max-w-md mx-auto">
           <button
             onClick={handleContinue}
-            disabled={!selectedAge}
+            disabled={!selectedAge} // O botão fica desabilitado se 'selectedAge' for 'null'
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             Continue
