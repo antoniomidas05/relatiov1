@@ -46,7 +46,7 @@ const PlanOption = ({ duration, price, originalPrice, isSelected, onClick }: any
         <div
           className={`font-bold text-white px-3 py-1.5 rounded-full flex items-center gap-0.5 ${isSelected ? "bg-blue-500" : "bg-gray-400"}`}
         >
-          <span>€</span>
+          <span>$</span>
           <span className="text-xl">{priceParts[0]}</span>
           <span className="text-xs self-start mt-1">.{priceParts[1]}</span>
           <span className="text-xs ml-1 self-end mb-0.5">per day</span>
@@ -120,9 +120,9 @@ function Step50HContent() {
 
   const handleCheckout = () => {
     const checkoutUrls = {
-      "4-week": "https://pay.hotmart.com/S102433548I?off=spm0k8ud&checkoutMode=6",
-      "12-week": "https://pay.hotmart.com/S102433548I?off=9fbzpe12&checkoutMode=6",
-      "24-week": "https://pay.hotmart.com/S102433548I?off=z434ypnk&checkoutMode=6",
+      "4-week": "https://pay.hotmart.com/M101988747B?off=f6krld1s&checkoutMode=6",
+      "12-week": "https://pay.hotmart.com/M101988747B?off=mygzu3p7&checkoutMode=6",
+      "24-week": "https://pay.hotmart.com/M101988747B?off=7u2okbfa&checkoutMode=6",
     }
     window.location.href = checkoutUrls[selectedPlan as keyof typeof checkoutUrls]
   }
@@ -280,7 +280,7 @@ function Step50HContent() {
             <PlanOption
               duration="4-week plan"
               price="0.99"
-              originalPrice="€2.00"
+              originalPrice="$2.00"
               isSelected={selectedPlan === "4-week"}
               onClick={() => setSelectedPlan("4-week")}
             />
@@ -288,14 +288,14 @@ function Step50HContent() {
           <PlanOption
             duration="12-week plan"
             price="0.56"
-            originalPrice="€1.12"
+            originalPrice="$1.12"
             isSelected={selectedPlan === "12-week"}
             onClick={() => setSelectedPlan("12-week")}
           />
           <PlanOption
             duration="24-week plan"
             price="0.44"
-            originalPrice="€0.88"
+            originalPrice="$0.88"
             isSelected={selectedPlan === "24-week"}
             onClick={() => setSelectedPlan("24-week")}
           />
@@ -478,7 +478,7 @@ function Step50HContent() {
             <PlanOption
               duration="4-week plan"
               price="0.99"
-              originalPrice="€2.00"
+              originalPrice="$2.00"
               isSelected={selectedPlan === "4-week"}
               onClick={() => setSelectedPlan("4-week")}
             />
@@ -486,14 +486,14 @@ function Step50HContent() {
           <PlanOption
             duration="12-week plan"
             price="0.56"
-            originalPrice="€1.12"
+            originalPrice="$1.12"
             isSelected={selectedPlan === "12-week"}
             onClick={() => setSelectedPlan("12-week")}
           />
           <PlanOption
             duration="24-week plan"
             price="0.44"
-            originalPrice="€0.88"
+            originalPrice="$0.88"
             isSelected={selectedPlan === "24-week"}
             onClick={() => setSelectedPlan("24-week")}
           />
