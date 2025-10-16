@@ -7,33 +7,36 @@ import Image from "next/image"
 function Step46Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  
-  // 1. Precisamos ler o gênero aqui para a lógica de roteamento
   const gender = searchParams.get("gender")
-  
   const [exName, setExName] = useState("")
 
   const handleContinue = () => {
+    if (!exName.trim()) return // Prevenção extra
+
     const params = new URLSearchParams(searchParams.toString())
     params.set("exName", exName)
     
-    // 2. Lógica de roteamento baseada no gênero
     const isFemale = gender === "female"
     const nextStepUrl = isFemale 
       ? "/quiz/step-47-m" // Rota para mulheres
       : "/quiz/step-47-h" // Rota para homens
       
-    // 3. Redireciona para a URL correta
     router.push(`${nextStepUrl}?${params.toString()}`)
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+    // O flex-col no container principal organiza o header, main e footer
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
       <header className="absolute top-0 p-4 w-full max-w-md mx-auto flex justify-center">
         <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={140} height={40} priority />
       </header>
       
-      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-md p-6 text-center">
+      {/* 
+        MUDANÇA 2: Adicionado padding-bottom ('pb-28') ao 'main'.
+        Isso garante que o conteúdo dentro do 'main' (o texto de privacidade)
+        não fique escondido atrás do rodapé fixo.
+      */}
+      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-md p-6 text-center pb-28">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           What's your Ex's name?
         </h1>
@@ -51,7 +54,12 @@ function Step46Content() {
         </p>
       </main>
 
-      <footer className="w-full p-4">
+      {/* 
+        MUDANÇA 1: Rodapé com posicionamento fixo.
+        - 'fixed bottom-0 left-0' prende o rodapé na parte inferior da tela.
+        - Estilo atualizado para consistência visual.
+      */}
+      <footer className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
         <div className="w-full max-w-md mx-auto">
           <button
             onClick={handleContinue}

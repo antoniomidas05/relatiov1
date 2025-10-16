@@ -16,15 +16,13 @@ function Step44Content() {
   const searchParams = useSearchParams()
 
   const currentStep = 35
-  const totalSteps = 38 // A imagem mostra /37, mas manteremos a consistência
+  const totalSteps = 38
   const progressPercentage = (currentStep / totalSteps) * 100
 
   const handleContinue = () => {
-    // Navega para a próxima etapa
     router.push(`/quiz/step-45?${searchParams.toString()}`)
   }
   
-  // Posições dos pins em porcentagem (left, top)
   const pinPositions = [
     { src: '/step44/pin_1.svg', pos: 'left-[15%] top-[15%]' },
     { src: '/step44/pin_2.svg', pos: 'left-[25%] top-[35%]' },
@@ -48,10 +46,15 @@ function Step44Content() {
           <div className="bg-purple-500 h-1 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
         </div>
       </div>
-      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center">
+      
+      {/* 
+        MUDANÇA 2: Adicionado padding-bottom ('pb-32') ao 'main'.
+        Isso cria o espaço necessário na parte inferior para que o conteúdo não
+        seja coberto pelo rodapé fixo.
+      */}
+      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center pb-32">
         <div className="w-full max-w-md flex flex-col items-center">
           
-          {/* Mapa com Pins */}
           <div className="relative w-full max-w-sm mx-auto mb-8">
             <Image 
               src="/step44/black_on_white_dotted_world_map.webp"
@@ -75,7 +78,13 @@ function Step44Content() {
           </p>
         </div>
       </main>
-      <footer className="w-full p-4 bg-gray-100">
+
+      {/* 
+        MUDANÇA 1: Rodapé com posicionamento fixo.
+        - 'fixed bottom-0 left-0' prende o rodapé na parte inferior da tela.
+        - O estilo foi atualizado para ter um fundo semi-transparente e borda.
+      */}
+      <footer className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
         <div className="w-full max-w-md mx-auto">
           <button onClick={handleContinue} className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-4 rounded-full shadow-lg hover:opacity-90 transition-opacity">
             Continue

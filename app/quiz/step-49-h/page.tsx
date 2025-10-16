@@ -16,33 +16,32 @@ function Step49MContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-between text-center p-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-between text-center p-4 pb-28">
       <header className="w-full max-w-md mx-auto flex justify-center py-8">
         <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={140} height={40} priority />
       </header>
-      
+
       <main className="w-full flex flex-col items-center px-4">
         <h1 className="text-3xl font-bold text-gray-800 leading-tight">
           Your 4-week <br />
-           {/* O nome do ex é inserido dinamicamente aqui */}
+          {/* O nome do ex é inserido dinamicamente aqui */}
           <span className="text-blue-600 capitalize">"{exName}" Back Plan</span> <br />
           is ready
         </h1>
 
         <div className="relative w-full max-w-lg mx-auto my-8">
-          <Image 
-            src="/step50/offer_plan_v2_male.png" 
-            alt="Relationship progress graph" 
-            width={600} 
-            height={400} 
+          <Image
+            src="/step50/offer_plan_v2_male.png"
+            alt="Relationship progress graph"
+            width={600}
+            height={400}
             className="w-full h-auto"
             priority
           />
-          
         </div>
       </main>
 
-      <footer className="w-full p-4">
+      <footer className="fixed bottom-0 left-0 right-0 w-full p-4 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-50">
         <div className="w-full max-w-md mx-auto">
           <button
             onClick={handleContinue}

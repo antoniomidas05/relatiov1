@@ -3,23 +3,22 @@
 import { useState, useTransition, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
-import { subscribeToActiveCampaign } from "../action" // A importação está correta
+import { subscribeToActiveCampaign } from "../action"
 
 function Step48Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  
-  // 1. Precisamos ler o gênero para a lógica de roteamento
   const gender = searchParams.get("gender")
 
   const [userEmail, setUserEmail] = useState("")
   const [isPending, startTransition] = useTransition()
 
   const handleContinue = () => {
+    // Validação extra para garantir que a função não prossiga se desabilitada
+    if (!isEmailValid || isPending) return
+
     const submissionData = { 
-      userEmail, 
-      // Se você ainda tiver o telefone em algum lugar (ex: URL), pode adicionar aqui
-      // phoneNumber: searchParams.get("phoneNumber") || ""
+      userEmail,
     }
 
     startTransition(async () => {
@@ -28,13 +27,11 @@ function Step48Content() {
         const finalParams = new URLSearchParams(searchParams.toString())
         finalParams.set("userEmail", userEmail)
 
-        // 2. Lógica de roteamento baseada no gênero
         const isFemale = gender === "female"
         const nextStepUrl = isFemale 
           ? "/quiz/step-49-m" // Rota para mulheres
           : "/quiz/step-49-h" // Rota para homens
         
-        // 3. Redireciona para a URL correta
         router.push(`${nextStepUrl}?${finalParams.toString()}`)
       } else {
         alert(result.message || "An error occurred. Please try again.")
@@ -45,12 +42,17 @@ function Step48Content() {
   const isEmailValid = userEmail.includes('@') && userEmail.length > 5;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
       <header className="absolute top-8 p-4 w-full max-w-md mx-auto flex justify-center">
         <Image src="/step1/logotype-color.svg" alt="Relatio Logo" width={140} height={40} priority />
       </header>
       
-      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-md p-6 text-center">
+      {/* 
+        MUDANÇA 2: Adicionado padding-bottom ('pb-28') ao 'main'.
+        Isso cria o espaço necessário para que o conteúdo não fique
+        escondido atrás do rodapé fixo.
+      */}
+      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-md p-6 text-center pb-28">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">
           Enter your email to get personal
         </h1>
@@ -78,7 +80,12 @@ function Step48Content() {
         </p>
       </main>
 
-      <footer className="w-full p-4">
+      {/* 
+        MUDANÇA 1: Rodapé com posicionamento fixo.
+        - 'fixed bottom-0 left-0' prende o rodapé na parte inferior da tela.
+        - Estilo atualizado para consistência visual.
+      */}
+      <footer className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
         <div className="w-full max-w-md mx-auto">
           <button
             onClick={handleContinue}
