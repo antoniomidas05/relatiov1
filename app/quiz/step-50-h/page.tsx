@@ -124,7 +124,9 @@ function Step50HContent() {
       "12-week": "https://pay.hotmart.com/M101988747B?off=mygzu3p7&checkoutMode=6",
       "24-week": "https://pay.hotmart.com/M101988747B?off=7u2okbfa&checkoutMode=6",
     }
-    window.location.href = checkoutUrls[selectedPlan as keyof typeof checkoutUrls]
+    const url = checkoutUrls[selectedPlan as keyof typeof checkoutUrls]
+    // Abre a URL em uma nova guia
+    window.open(url, "_blank")
   }
 
   const testimonials = [
