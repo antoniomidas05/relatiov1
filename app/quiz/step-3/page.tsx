@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { Suspense } from "react"
 
-// Componente para o ícone de seta para voltar (reutilizado)
+// Componente para o ícone de seta para voltar (sem alterações)
 const BackArrowIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -52,9 +52,15 @@ function Step3Content() {
           height={35}
           priority
         />
-        <div className="w-10"></div>
+        <div className="w-10"></div> {/* Espaçador para alinhar o logo */}
       </header>
-      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center">
+
+      {/* 
+        MUDANÇA 2: Adicionado padding-bottom ('pb-32') ao 'main'.
+        Isso cria espaço na parte inferior para que o conteúdo não fique
+        escondido atrás do novo rodapé fixo.
+      */}
+      <main className="flex-grow flex flex-col items-center justify-center p-6 text-center pb-32">
         <div className="w-full max-w-md flex flex-col items-center">
           <h2 className="text-xl font-bold text-blue-500">
             1.3 MILLION PEOPLE
@@ -74,7 +80,13 @@ function Step3Content() {
           <p className="text-gray-600 max-w-xs">{captionText}</p>
         </div>
       </main>
-      <footer className="w-full p-4 bg-gray-100">
+
+      {/* 
+        MUDANÇA 1: Rodapé com posicionamento fixo.
+        - 'fixed bottom-0 left-0' prende o rodapé na parte inferior da tela.
+        - O estilo foi atualizado para ter um fundo semi-transparente e borda.
+      */}
+      <footer className="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200">
         <div className="w-full max-w-md mx-auto">
           <button
             onClick={handleContinue}
